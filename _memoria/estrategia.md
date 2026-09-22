@@ -1,13 +1,21 @@
 # Estratégia
 
-> O que importa agora. Prioridades, metas, prazos.
-> O Claude usa isso pra decidir o que sugerir primeiro e o que adiar.
-> Atualize sempre que as prioridades mudarem.
-
 ## Fase
+
+Estruturar o marketing da WD Blocos.
 
 ## Prioridade principal
 
+Fortalecer as redes sociais e organizar um gerador de orçamentos.
+
 ## O que pode esperar
 
+Demandas que não contribuam diretamente para presença nas redes sociais ou agilidade na criação de orçamentos.
+
 ## Contexto com prazo
+
+Sem prazo informado.
+
+## Rotina candidata a skill
+
+Ainda não identificada. Usar `/mapear-rotinas` quando houver uma tarefa semanal clara para automatizar.

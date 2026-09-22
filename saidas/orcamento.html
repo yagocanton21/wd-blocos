@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gerador de Orçamento — WD Blocos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0f1117;
+      --surface:  #181c27;
+      --surface2: #1e2333;
+      --border:   #2a2f45;
+      --accent:   #f59e0b;
+      --accent2:  #fbbf24;
+      --text:     #e8eaf2;
+      --muted:    #7b84a0;
+      --danger:   #ef4444;
+      --success:  #22c55e;
+      --radius:   12px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Layout ── */
+    .app { display: grid; grid-template-rows: auto 1fr; min-height: 100vh; }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-icon {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--accent), #d97706);
+      border-radius: 10px;
+      display: grid; place-items: center;
+      font-size: 18px;
+    }
+    .logo-text { font-size: 18px; font-weight: 700; }
+    .logo-sub  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .header-actions { display: flex; gap: 10px; }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 9px 18px;
+      border-radius: 8px; border: none; cursor: pointer;
+      font-family: inherit; font-size: 14px; font-weight: 600;
+      transition: all .18s ease;
+    }
+    .btn-primary { background: var(--accent); color: #0f1117; }
+    .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(245,158,11,.35); }
+    .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
+    .btn-danger { background: transparent; color: var(--danger); border: 1px solid transparent; padding: 6px 10px; font-size: 13px; }
+    .btn-danger:hover { background: rgba(239,68,68,.12); border-color: var(--danger); }
+
+    /* ── Main ── */
+    main { padding: 32px; max-width: 960px; margin: 0 auto; width: 100%; }
+
+    /* ── Section cards ── */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; }
+    .card-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 16px; }
+
+    /* ── Form grid ── */
+    .form-grid { display: grid; gap: 14px; }
+    .form-grid-2 { grid-template-columns: 1fr 1fr; }
+
+    label { display: block; font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 6px; }
+
+    input, textarea, select {
+      width: 100%;
+      background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); font-family: inherit; font-size: 14px; padding: 10px 14px;
+      transition: border .15s; outline: none;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(245,158,11,.12); }
+    textarea { resize: vertical; min-height: 80px; }
+
+    /* ── Adicionar item ── */
+    .add-item-row {
+      display: grid;
+      grid-template-columns: 2fr 80px 120px 130px auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    /* ── Tabela de itens ── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead th { text-align: left; padding: 10px 12px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); border-bottom: 1px solid var(--border); }
+    tbody tr { border-bottom: 1px solid rgba(42,47,69,.6); transition: background .12s; }
+    tbody tr:hover { background: var(--surface2); }
+    tbody td { padding: 11px 12px; }
+    .item-total { font-weight: 600; color: var(--accent); text-align: right; }
+    .empty-row td { text-align: center; color: var(--muted); padding: 32px; font-size: 14px; }
+
+    /* ── Paginação ── */
+    .pagination { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+    .pagination-info { font-size: 13px; color: var(--muted); }
+    .pagination-controls { display: flex; gap: 6px; }
+    .page-btn { width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--text); font-size: 13px; font-weight: 600; cursor: pointer; display: grid; place-items: center; transition: all .15s; font-family: inherit; }
+    .page-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); background: rgba(245,158,11,.08); }
+    .page-btn.active { background: var(--accent); border-color: var(--accent); color: #0f1117; }
+    .page-btn:disabled { opacity: .3; cursor: default; }
+
+    /* ── Totais ── */
+    .totals-grid { display: grid; grid-template-columns: 1fr auto; gap: 8px 48px; max-width: 340px; margin-left: auto; }
+    .totals-label { color: var(--muted); font-size: 14px; align-self: center; }
+    .totals-value { text-align: right; font-weight: 600; font-size: 14px; }
+    .totals-divider { grid-column: 1 / -1; border: none; border-top: 1px solid var(--border); margin: 4px 0; }
+    .totals-label.big, .totals-value.big { font-size: 18px; font-weight: 700; color: var(--accent); }
+
+    /* ── Validade ── */
+    .validade-row { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+    .validade-field { display: flex; align-items: center; gap: 8px; }
+    .validade-field label { margin: 0; white-space: nowrap; }
+    .validade-field input { width: 160px; }
+
+    /* ── Toast ── */
+    #toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--success); color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; transition: transform .3s ease; z-index: 9999; pointer-events: none; }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ── Print / PDF ── */
+    @media print {
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      body { background: #fff; color: #111; font-size: 12px; }
+      header, .no-print, #toast { display: none !important; }
+      .pagination { display: none !important; }
+
+      .card { border: 1px solid #e5e7eb; padding: 16px; margin-bottom: 12px; background: #fff; box-shadow: none; border-radius: 6px; }
+      .card-title { color: #555; }
+
+      table { font-size: 11px; }
+      thead th { color: #555; border-bottom: 1px solid #ccc; }
+      tbody tr { border-bottom: 1px solid #eee; }
+      tbody tr:hover { background: transparent; }
+      /* Mostrar TODOS os itens no PDF, independente da página */
+      tbody tr.offscreen { display: table-row !important; }
+
+      input, textarea, select { border: none; background: transparent; color: #111; padding: 0; font-size: inherit; pointer-events: none; box-shadow: none; }
+      .btn, .btn-danger { display: none !important; }
+
+      .totals-label { color: #555; }
+      .totals-value { color: #111; }
+      .totals-label.big, .totals-value.big { color: #b45309; }
+      .item-total { color: #b45309; }
+
+      .print-header { display: block !important; }
+    }
+
+    .print-header { display: none; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #b45309; }
+    .print-header h1 { font-size: 22px; font-weight: 800; color: #b45309; }
+    .print-header p { font-size: 13px; color: #555; margin-top: 4px; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🧱</div>
+      <div>
+        <div class="logo-text">WD Blocos</div>
+        <div class="logo-sub">Gerador de Orçamento</div>
+      </div>
+    </div>
+    <div class="header-actions no-print">
+      <button class="btn btn-ghost" onclick="limparTudo()">↺ Novo</button>
+      <button class="btn btn-primary" onclick="window.print()">⬇ Exportar PDF</button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- Cabeçalho só no PDF -->
+    <div class="print-header">
+      <h1>🧱 WD Blocos — Orçamento</h1>
+      <p>Materiais de construção para sua obra</p>
+    </div>
+
+    <!-- Dados do cliente -->
+    <div class="card">
+      <div class="card-title">Dados do cliente</div>
+      <div class="form-grid form-grid-2">
+        <div>
+          <label for="clienteNome">Nome / Empresa</label>
+          <input id="clienteNome" type="text" placeholder="Ex: João Silva" />
+        </div>
+        <div>
+          <label for="clienteTelefone">Telefone / WhatsApp</label>
+          <input id="clienteTelefone" type="text" placeholder="(00) 90000-0000" />
+        </div>
+        <div>
+          <label for="clienteEndereco">Endereço da obra</label>
+          <input id="clienteEndereco" type="text" placeholder="Rua, número, bairro" />
+        </div>
+        <div>
+          <label for="orcamentoNum">Nº do orçamento</label>
+          <input id="orcamentoNum" type="text" placeholder="2025-001" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Adicionar item -->
+    <div class="card no-print">
+      <div class="card-title">Adicionar item</div>
+      <div class="add-item-row">
+        <div>
+          <label for="itemDesc">Descrição</label>
+          <input id="itemDesc" type="text" placeholder="Ex: Bloco cerâmico 9x19x19"
+            onkeydown="if(event.key==='Enter') adicionarItem()" />
+        </div>
+        <div>
+          <label for="itemQtd">Qtd</label>
+          <input id="itemQtd" type="number" min="0" step="any" placeholder="0" />
+        </div>
+        <div>
+          <label for="itemUnidade">Unidade</label>
+          <select id="itemUnidade">
+            <option>un</option>
+            <option>m²</option>
+            <option>m³</option>
+            <option>m</option>
+            <option>kg</option>
+            <option>sc</option>
+            <option>cx</option>
+            <option>fardo</option>
+            <option>pç</option>
+          </select>
+        </div>
+        <div>
+          <label for="itemPreco">Preço unit. (R$)</label>
+          <input id="itemPreco" type="number" min="0" step="0.01" placeholder="0,00" />
+        </div>
+        <div>
+          <button class="btn btn-primary" onclick="adicionarItem()">+ Adicionar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabela de itens -->
+    <div class="card">
+      <div class="card-title">Itens do orçamento</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Descrição</th>
+              <th>Qtd</th>
+              <th>Unid.</th>
+              <th>Preço unit.</th>
+              <th>Total</th>
+              <th class="no-print" style="width:40px"></th>
+            </tr>
+          </thead>
+          <tbody id="tabelaItens">
+            <tr class="empty-row" id="emptyRow">
+              <td colspan="7">Nenhum item adicionado ainda.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginação — só na tela, escondida no PDF via .no-print -->
+      <div class="pagination no-print" id="paginacaoWrap" style="display:none">
+        <span class="pagination-info" id="paginacaoInfo"></span>
+        <div class="pagination-controls" id="paginacaoControles"></div>
+      </div>
+    </div>
+
+    <!-- Totais -->
+    <div class="card">
+      <div class="card-title">Resumo</div>
+      <div class="totals-grid">
+        <span class="totals-label">Subtotal</span>
+        <span class="totals-value" id="subtotal">R$ 0,00</span>
+
+        <span class="totals-label">Desconto (R$)</span>
+        <span class="totals-value">
+          <input id="desconto" type="number" min="0" step="0.01" placeholder="0,00"
+            style="width:110px;text-align:right" oninput="atualizarTotais()" />
+        </span>
+
+        <hr class="totals-divider" />
+        <hr class="totals-divider" />
+
+        <span class="totals-label big">Total</span>
+        <span class="totals-value big" id="totalFinal">R$ 0,00</span>
+      </div>
+    </div>
+
+    <!-- Validade & Observações -->
+    <div class="card">
+      <div class="card-title">Validade & Observações</div>
+      <div class="validade-row">
+        <div class="validade-field">
+          <label for="dataOrc">Data:</label>
+          <input id="dataOrc" type="date" />
+        </div>
+        <div class="validade-field">
+          <label for="validadeOrc">Válido até:</label>
+          <input id="validadeOrc" type="date" />
+        </div>
+      </div>
+      <div>
+        <label for="observacoes">Observações</label>
+        <textarea id="observacoes" placeholder="Condições de pagamento, prazo de entrega, forma de frete, etc."></textarea>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast">✓ Item adicionado</div>
+
+<script>
+  // ── Estado ──────────────────────────────────────────────────────────────
+  const ITENS_POR_PAGINA = 10;
+  let itens = [];
+  let paginaAtual = 1;
+
+  // ── Init ──────────────────────────────────────────────────────────────
+  document.getElementById('dataOrc').value      = hoje();
+  document.getElementById('validadeOrc').value  = daqui(15);
+  document.getElementById('orcamentoNum').value  = gerarNumOrc();
+
+  // ── Helpers ──────────────────────────────────────────────────────────
+  function hoje() { return new Date().toISOString().slice(0, 10); }
+  function daqui(dias) {
+    const d = new Date(); d.setDate(d.getDate() + dias);
+    return d.toISOString().slice(0, 10);
+  }
+  function gerarNumOrc() {
+    const ano = new Date().getFullYear();
+    return `${ano}-${String(Math.floor(Math.random() * 900) + 100)}`;
+  }
+  function formatBRL(v) {
+    return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+  function formatQtd(n) {
+    return n % 1 === 0 ? n.toString() : n.toLocaleString('pt-BR');
+  }
+  function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // ── Adicionar item ────────────────────────────────────────────────────
+  function adicionarItem() {
+    const desc  = document.getElementById('itemDesc').value.trim();
+    const qtd   = parseFloat(document.getElementById('itemQtd').value);
+    const unid  = document.getElementById('itemUnidade').value;
+    const preco = parseFloat(document.getElementById('itemPreco').value);
+
+    if (!desc)             { flash('itemDesc'); return; }
+    if (!qtd || qtd <= 0)  { flash('itemQtd');  return; }
+    if (isNaN(preco) || preco < 0) { flash('itemPreco'); return; }
+
+    itens.push({ id: Date.now(), desc, qtd, unid, preco });
+
+    // Navega para a última página ao adicionar
+    paginaAtual = Math.ceil(itens.length / ITENS_POR_PAGINA);
+
+    renderTabela();
+    atualizarTotais();
+    limparForm();
+    showToast('✓ Item adicionado');
+    document.getElementById('itemDesc').focus();
+  }
+
+  function limparForm() {
+    ['itemDesc','itemQtd','itemPreco'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('itemUnidade').selectedIndex = 0;
+  }
+
+  // ── Remover item ──────────────────────────────────────────────────────
+  function removerItem(id) {
+    itens = itens.filter(i => i.id !== id);
+    const totalPags = Math.max(1, Math.ceil(itens.length / ITENS_POR_PAGINA));
+    if (paginaAtual > totalPags) paginaAtual = totalPags;
+    renderTabela();
+    atualizarTotais();
+  }
+
+  // ── Renderizar tabela ─────────────────────────────────────────────────
+  // Na TELA: só mostra os 10 itens da página atual (os demais ficam com display:none)
+  // No PDF:  CSS @media print remove o display:none da classe .offscreen → todos visíveis
+  function renderTabela() {
+    const tbody = document.getElementById('tabelaItens');
+
+    if (itens.length === 0) {
+      tbody.innerHTML = '<tr class="empty-row" id="emptyRow"><td colspan="7">Nenhum item adicionado ainda.</td></tr>';
+      document.getElementById('paginacaoWrap').style.display = 'none';
+      return;
+    }
+
+    const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
+    const fim    = inicio + ITENS_POR_PAGINA;
+
+    tbody.innerHTML = '';
+    itens.forEach((item, idx) => {
+      const total    = item.qtd * item.preco;
+      const naPagina = idx >= inicio && idx < fim;
+      const tr       = document.createElement('tr');
+
+      if (!naPagina) {
+        tr.className    = 'offscreen';   // CSS de print remove o display:none desta classe
+        tr.style.display = 'none';       // esconde na tela
+      }
+
+      tr.innerHTML = `
+        <td>${idx + 1}</td>
+        <td>${esc(item.desc)}</td>
+        <td>${formatQtd(item.qtd)}</td>
+        <td>${esc(item.unid)}</td>
+        <td>${formatBRL(item.preco)}</td>
+        <td class="item-total">${formatBRL(total)}</td>
+        <td class="no-print">
+          <button class="btn btn-danger" onclick="removerItem(${item.id})" title="Remover">✕</button>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+
+    renderPaginacao();
+  }
+
+  // ── Controles de paginação ────────────────────────────────────────────
+  function renderPaginacao() {
+    const totalPags = Math.ceil(itens.length / ITENS_POR_PAGINA);
+    const wrap = document.getElementById('paginacaoWrap');
+
+    if (totalPags <= 1) {
+      wrap.style.display = 'none';
+      return;
+    }
+
+    wrap.style.display = 'flex';
+
+    const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA + 1;
+    const fim    = Math.min(paginaAtual * ITENS_POR_PAGINA, itens.length);
+    document.getElementById('paginacaoInfo').textContent =
+      `Exibindo ${inicio}–${fim} de ${itens.length} itens`;
+
+    const ctrl = document.getElementById('paginacaoControles');
+    ctrl.innerHTML = '';
+
+    const prev = criarPageBtn('‹', paginaAtual === 1, () => irPara(paginaAtual - 1));
+    ctrl.appendChild(prev);
+
+    for (let p = 1; p <= totalPags; p++) {
+      const btn = criarPageBtn(p, false, () => irPara(p));
+      if (p === paginaAtual) btn.classList.add('active');
+      ctrl.appendChild(btn);
+    }
+
+    const next = criarPageBtn('›', paginaAtual === totalPags, () => irPara(paginaAtual + 1));
+    ctrl.appendChild(next);
+  }
+
+  function criarPageBtn(label, disabled, onClick) {
+    const btn = document.createElement('button');
+    btn.className   = 'page-btn';
+    btn.textContent = label;
+    btn.disabled    = disabled;
+    btn.onclick     = onClick;
+    return btn;
+  }
+
+  function irPara(p) {
+    const totalPags = Math.ceil(itens.length / ITENS_POR_PAGINA);
+    if (p < 1 || p > totalPags) return;
+    paginaAtual = p;
+    renderTabela();
+  }
+
+  // ── Totais ────────────────────────────────────────────────────────────
+  function atualizarTotais() {
+    const subtotal = itens.reduce((s, i) => s + i.qtd * i.preco, 0);
+    const desconto = parseFloat(document.getElementById('desconto').value) || 0;
+    const total    = Math.max(0, subtotal - desconto);
+    document.getElementById('subtotal').textContent   = formatBRL(subtotal);
+    document.getElementById('totalFinal').textContent = formatBRL(total);
+  }
+
+  // ── Limpar tudo ───────────────────────────────────────────────────────
+  function limparTudo() {
+    if (itens.length > 0 && !confirm('Limpar o orçamento atual?')) return;
+    itens = []; paginaAtual = 1;
+    renderTabela(); atualizarTotais();
+    ['clienteNome','clienteTelefone','clienteEndereco','observacoes','desconto']
+      .forEach(id => document.getElementById(id).value = '');
+    document.getElementById('orcamentoNum').value  = gerarNumOrc();
+    document.getElementById('dataOrc').value       = hoje();
+    document.getElementById('validadeOrc').value   = daqui(15);
+  }
+
+  // ── UX helpers ────────────────────────────────────────────────────────
+  function flash(id) {
+    const el = document.getElementById(id);
+    el.style.borderColor = 'var(--danger)';
+    el.focus();
+    setTimeout(() => el.style.borderColor = '', 1200);
+  }
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+</script>
+</body>
+</html>

@@ -1,115 +1,44 @@
-# MazyOS — Sistema operacional do negócio
+# WD Blocos — MazyOS
 
-Sua empresa roda em cima desse arquivo. Aqui ficam as regras de operação
-do MazyOS — como o Claude lê o contexto, aprende com correções, mantém
-tudo atualizado e cria skills novas conforme a operação evolui.
+> Operação da WD Blocos. Aqui ficam o contexto do negócio, marketing, dados e materiais produzidos para apoiar vendas de materiais de construção.
 
-Esse arquivo é editável. Quando o `/instalar` rodar, ele complementa o
-final dessa página com as regras específicas do seu negócio.
+## O que é esse workspace
 
----
+Central de operação da WD Blocos para organizar marketing, conteúdos de redes sociais, dados e orçamentos.
 
-## Contexto do negócio
+**Estrutura de pastas:**
 
-No início de toda conversa, ler os seguintes arquivos (quando existirem
-e estiverem preenchidos):
+- `_memoria/` — negócio, tom de voz e foco atual
+- `identidade/` — logo e referências visuais
+- `marketing/` — conteúdos e planejamento de redes sociais
+- `saidas/` — orçamentos, documentos e materiais pontuais
+- `dados/` — arquivos para análise
+- `scripts/` — automações e ferramentas
 
-1. `_memoria/empresa.md` — quem é o usuário, o que faz, como funciona o negócio
-2. `_memoria/preferencias.md` — tom de voz, estilo de escrita, o que evitar
-3. `_memoria/estrategia.md` — foco atual, prioridades, prazos
+## Sobre a WD Blocos
 
-Usar essas informações como base pra qualquer resposta ou decisão. Ao
-sugerir prioridades, formatos ou abordagens, considerar o foco atual
-descrito em `estrategia.md`.
+A WD Blocos fornece materiais de construção para pessoas construindo a própria casa, mestres de obra e construtoras. A operação é conduzida por uma pessoa.
 
-Pra qualquer tarefa visual (carrossel, post, landing page), consultar
-`identidade/design-guide.md` como referência de estilo.
+## Foco atual
 
-Não é necessário listar o que foi lido nem confirmar a leitura. Apenas
-usar o contexto naturalmente.
+- Fortalecer as redes sociais
+- Estruturar um gerador de orçamentos
 
----
+## Tom de voz
 
-## Fluxo de trabalho
+Direto, confiante, próximo e específico sobre construção. Demonstrar conhecimento do assunto e sempre facilitar o próximo passo para pedir orçamento.
 
-Antes de executar qualquer tarefa, verificar se existe skill relevante
-em `.claude/skills/`. Se encontrar, seguir as instruções da skill. Se
-não encontrar, executar a tarefa normalmente.
+Evitar legendas genéricas.
 
-Ao concluir uma tarefa que não tinha skill mas parece repetível (o
-usuário provavelmente vai pedir de novo no futuro), perguntar:
+## Regras do sistema
 
-> "Isso pode virar uma skill pra próxima vez. Quer que eu crie?"
+- Antes de qualquer tarefa, ler `_memoria/empresa.md`, `_memoria/preferencias.md` e `_memoria/estrategia.md`.
+- Para materiais visuais, consultar `identidade/design-guide.md`.
+- Conteúdos para redes sociais devem ser concretos, úteis para quem está construindo e incluir uma chamada clara para orçamento quando apropriado.
+- Ao identificar uma tarefa recorrente, sugerir `/mapear-rotinas` para transformá-la em skill.
 
-Não perguntar pra tarefas pontuais ou perguntas simples. Só quando o
-padrão de repetição for claro.
+## Ferramentas conectadas
 
----
-
-## Aprender com correções
-
-Quando o usuário corrigir algo, melhorar uma resposta ou dar uma
-instrução que parece permanente (frases como "na verdade é assim", "não
-faça mais isso", "prefiro assim", "sempre que...", "evita...", "da
-próxima vez..."), perguntar:
-
-> "Quer que eu salve isso pra não precisar repetir?"
-
-Se sim, identificar onde faz mais sentido salvar:
-
-- **Sobre o negócio** (clientes, serviços, mercado) → `_memoria/empresa.md`
-- **Sobre preferências e estilo** (tom de voz, formato, o que evitar) → `_memoria/preferencias.md`
-- **Sobre prioridades e foco** (projetos, metas, prazos) → `_memoria/estrategia.md`
-- **Regra de comportamento nessa pasta** → próprio `CLAUDE.md`
-
-Salvar com uma linha nova clara, sem reformatar o arquivo inteiro.
-Confirmar mostrando a linha adicionada.
-
-Não perguntar se a correção for óbvia de contexto imediato (ex: "na
-verdade o arquivo se chama X"). Só perguntar quando a informação tiver
-valor duradouro.
-
----
-
-## Manter contexto atualizado
-
-Ao terminar uma tarefa que mudou algo relevante (cliente novo, skill
-nova, mudança de foco, processo novo, ferramenta instalada, estrutura
-alterada), perguntar:
-
-> "Isso mudou algo no teu contexto. Quer que eu atualize a memória?"
-
-Se sim, identificar o que atualizar:
-
-- **Cliente, serviço, ferramenta, equipe** → `_memoria/empresa.md`
-- **Mudança de prioridade ou foco** → `_memoria/estrategia.md`
-- **Tom ou estilo** → `_memoria/preferencias.md`
-- **Pasta, regra de organização, skill criada** → `CLAUDE.md`
-- **Visual (cores, fontes, logo)** → `identidade/design-guide.md`
-
-Mostrar o que vai mudar antes de salvar. Não reformatar o arquivo
-inteiro, só adicionar ou editar a linha relevante.
-
-**Quando NÃO perguntar:**
-- Tarefas pontuais sem impacto no contexto (escrever um email avulso, criar um post)
-- Perguntas simples ou conversas sem ação
-- Mudanças já salvas pelo bloco "Aprender com correções"
-
-**Dica:** rode `/atualizar` pra uma varredura completa quando houver dúvida.
-
----
-
-## Criação de skills
-
-Quando o usuário pedir skill nova:
-
-1. Verificar se existe template relevante em `templates/skills/`. Se
-   existir, usar como base e adaptar pro contexto
-2. Perguntar se é específica desse projeto ou útil em qualquer:
-   - Específica → `.claude/skills/nome-da-skill/SKILL.md` (local)
-   - Universal → `~/.claude/skills/nome-da-skill/SKILL.md` (global)
-3. Ler `_memoria/empresa.md` e `_memoria/preferencias.md` pra calibrar
-   o conteúdo da skill ao contexto do negócio
-4. Se a skill precisar de arquivos de apoio (templates, exemplos),
-   criar dentro da pasta da skill
-5. Seguir o fluxo da skill-creator nativa do Claude Code
+- [x] Site institucional
+- [x] Instagram
+- [ ] Gerador de orçamentos
