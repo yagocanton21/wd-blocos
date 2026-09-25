@@ -22,7 +22,8 @@ A WD Blocos fornece materiais de construção para pessoas construindo a própri
 ## Foco atual
 
 - Fortalecer as redes sociais
-- Estruturar um gerador de orçamentos
+- Catálogo Digital / Vitrine Técnica de Produtos (~200 itens, sem fluxo de orçamento) — em negociação (faixa de R$ 1.000)
+- Gerador de orçamentos (pausado por enquanto)
 
 ## Tom de voz
 
@@ -41,4 +42,5 @@ Evitar legendas genéricas.
 
 - [x] Site institucional
 - [x] Instagram
-- [ ] Gerador de orçamentos
+- [ ] Catálogo Digital (em negociação / infraestrutura pronta na VPS2)
+- [ ] Gerador de orçamentos (pausado)

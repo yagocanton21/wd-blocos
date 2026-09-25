@@ -6,11 +6,13 @@ Estruturar o marketing da WD Blocos.
 
 ## Prioridade principal
 
-Fortalecer as redes sociais e organizar um gerador de orçamentos.
+- Fortalecer as redes sociais.
+- Catálogo Digital / Vitrine Técnica de Produtos (~200 itens, sem fluxo de orçamento) — em negociação (faixa de R$ 1.000). Infraestrutura pronta na VPS2.
 
 ## O que pode esperar
 
-Demandas que não contribuam diretamente para presença nas redes sociais ou agilidade na criação de orçamentos.
+- Funcionalidade de gerador de orçamentos (adiada por enquanto a pedido do cliente/usuário; foco estrito em vitrine de catálogo).
+- Demandas que não contribuam diretamente para presença digital ou vitrine técnica dos produtos.
 
 ## Contexto com prazo
 
