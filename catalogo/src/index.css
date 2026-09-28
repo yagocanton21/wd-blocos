@@ -1,0 +1,81 @@
+/* ==========================================================================
+   WD BLOCOS - GLOBAL DESIGN TOKENS & RESET
+   ========================================================================== */
+
+:root {
+  /* Identidade WD Blocos */
+  --primary: #FF6600;
+  --primary-hover: #E05A00;
+  --primary-light: rgba(255, 102, 0, 0.08);
+  --primary-border: rgba(255, 102, 0, 0.25);
+
+  /* Superfícies e Contrastes */
+  --dark-bg: #0F172A;
+  --dark-surface: #1E293B;
+  --dark-border: #334155;
+
+  --light-bg: #E2E8F0;
+  --light-surface: #FFFFFF;
+  --light-subtle: #CBD5E1;
+  --border-light: #CBD5E1;
+  --border-medium: #94A3B8;
+
+  /* Tipografia & Cores */
+  --text-main: #0F172A;
+  --text-muted: #64748B;
+  --text-light: #94A3B8;
+  --text-white: #FFFFFF;
+
+  /* Status */
+  --success: #16A34A;
+  --success-bg: #DCFCE7;
+  --warning: #D97706;
+  --warning-bg: #FEF3C7;
+
+  /* Raio & Sombras */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.12);
+  --shadow-glow: 0 0 20px rgba(255, 102, 0, 0.25);
+
+  --font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reset Global */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--light-bg);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+button, input, textarea, select {
+  font-family: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px;
+}

@@ -1,0 +1,306 @@
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import Header from './components/Header';
+import ProductCard from './components/ProductCard';
+import QuoteDrawer from './components/QuoteDrawer';
+import Pagination from './components/Pagination';
+import AdminPanel from './components/AdminPanel';
+import Footer from './components/Footer';
+import { CATEGORIAS } from './data/produtos';
+import { getProdutos } from './services/api';
+import { SlidersHorizontal, PackageOpen, Layers } from 'lucide-react';
+import styles from './App.module.css';
+
+export default function App() {
+  const [produtos, setProdutos] = useState([]);
+  const [carregando, setCarregando] = useState(true);
+  const [categoriaAtiva, setCategoriaAtiva] = useState('todos');
+  const [termoBusca, setTermoBusca] = useState('');
+  const [termoBuscaDebounced, setTermoBuscaDebounced] = useState('');
+  const [ordenacao, setOrdenacao] = useState('destaque');
+
+  // Modo Administrador
+  const [modoAdmin, setModoAdmin] = useState(() => {
+    return window.location.search.includes('admin') || window.location.hash.includes('admin');
+  });
+
+  // Estados de Paginação
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const [itensPorPagina, setItensPorPagina] = useState(12);
+
+  const catalogoRef = useRef(null);
+
+  // Estado do Carrinho / Lista de Cotação
+  const [itensCotacao, setItensCotacao] = useState(() => {
+    try {
+      const salvo = localStorage.getItem('wd_cotacao_itens');
+      return salvo ? JSON.parse(salvo) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const [drawerAberto, setDrawerAberto] = useState(false);
+
+  // Carrega produtos do PostgreSQL
+  const carregarProdutos = async () => {
+    setCarregando(true);
+    try {
+      const lista = await getProdutos({
+        categoria: categoriaAtiva,
+        busca: termoBuscaDebounced,
+        ordenacao
+      });
+      setProdutos(lista);
+    } catch (err) {
+      console.error('Erro ao carregar produtos:', err);
+    } finally {
+      setCarregando(false);
+    }
+  };
+
+  // Debounce: aguarda 350ms sem digitar antes de buscar
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setTermoBuscaDebounced(termoBusca.trim());
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [termoBusca]);
+
+  useEffect(() => {
+    if (!modoAdmin) {
+      carregarProdutos();
+    }
+  }, [categoriaAtiva, termoBuscaDebounced, ordenacao, modoAdmin]);
+
+  // Persiste a lista de cotação no navegador
+  useEffect(() => {
+    try {
+      localStorage.setItem('wd_cotacao_itens', JSON.stringify(itensCotacao));
+    } catch (e) {
+      console.error('Erro ao salvar no localStorage', e);
+    }
+  }, [itensCotacao]);
+
+  // Reseta para a página 1 ao alterar filtros, busca ou ordenação
+  useEffect(() => {
+    setPaginaAtual(1);
+  }, [categoriaAtiva, termoBuscaDebounced, ordenacao]);
+
+  // Contagem de produtos por categoria
+  const contagemPorCategoria = useMemo(() => {
+    const counts = { todos: produtos.length };
+    CATEGORIAS.forEach(cat => {
+      if (cat.id !== 'todos') {
+        counts[cat.id] = produtos.filter(p => p.categoria === cat.id).length;
+      }
+    });
+    return counts;
+  }, [produtos]);
+
+  // Paginação dos Itens Filtrados
+  const totalPaginas = Math.ceil(produtos.length / itensPorPagina) || 1;
+
+  const produtosPaginados = useMemo(() => {
+    const indiceInicio = (paginaAtual - 1) * itensPorPagina;
+    return produtos.slice(indiceInicio, indiceInicio + itensPorPagina);
+  }, [produtos, paginaAtual, itensPorPagina]);
+
+  const handleMudarPagina = (novaPagina) => {
+    setPaginaAtual(novaPagina);
+    if (catalogoRef.current) {
+      catalogoRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  // Manipulação do Carrinho de Cotação
+  const handleAdicionarCotacao = (produto, quantidade) => {
+    setItensCotacao(prev => {
+      const index = prev.findIndex(item => item.produto.id === produto.id);
+      if (index > -1) {
+        const novos = [...prev];
+        novos[index] = {
+          ...novos[index],
+          quantidade: novos[index].quantidade + quantidade
+        };
+        return novos;
+      } else {
+        return [...prev, { produto, quantidade }];
+      }
+    });
+  };
+
+  const handleAtualizarQuantidade = (produtoId, novaQuantidade) => {
+    setItensCotacao(prev => 
+      prev.map(item => 
+        item.produto.id === produtoId ? { ...item, quantidade: novaQuantidade } : item
+      )
+    );
+  };
+
+  const handleRemoverItem = (produtoId) => {
+    setItensCotacao(prev => prev.filter(item => item.produto.id !== produtoId));
+  };
+
+  const handleLimparCotacao = () => {
+    if (window.confirm('Deseja realmente esvaziar todos os itens da cotação?')) {
+      setItensCotacao([]);
+    }
+  };
+
+  // Mapeamento de quantidades para exibir no card
+  const mapQuantidades = useMemo(() => {
+    const mapa = {};
+    itensCotacao.forEach(item => {
+      mapa[item.produto.id] = item.quantidade;
+    });
+    return mapa;
+  }, [itensCotacao]);
+
+  const totalItens = itensCotacao.length;
+  const totalVolumes = itensCotacao.reduce((acc, item) => acc + item.quantidade, 0);
+
+  // SE ESTIVER NO MODO ADMINISTRADOR:
+  if (modoAdmin) {
+    return (
+      <AdminPanel 
+        onVoltarCatalogo={() => {
+          setModoAdmin(false);
+          carregarProdutos();
+        }} 
+      />
+    );
+  }
+
+  // MODO CATÁLOGO PÚBLICO
+  return (
+    <div className={styles.appRoot}>
+      {/* Cabeçalho */}
+      <Header 
+        termoBusca={termoBusca}
+        setTermoBusca={setTermoBusca}
+        totalItensCotacao={totalItens}
+        onAbrirCotacao={() => setDrawerAberto(true)}
+        onAbrirAdmin={() => setModoAdmin(true)}
+      />
+
+      {/* Conteúdo Principal do Catálogo */}
+      <main className={styles.catalogContentSection} ref={catalogoRef}>
+        <div className="container">
+          {/* Barra de Controles e Ordenação */}
+          <div className={styles.catalogHeaderRow}>
+            <div className={styles.catalogTitleGroup}>
+              <h2>
+                {categoriaAtiva === 'todos' 
+                  ? 'Catálogo Técnico Completo' 
+                  : CATEGORIAS.find(c => c.id === categoriaAtiva)?.label}
+              </h2>
+              <span className={styles.catalogCountInfo}>
+                {carregando ? (
+                  'Carregando catálogo...'
+                ) : produtos.length === 0 ? (
+                  'Nenhum produto encontrado'
+                ) : (
+                  `Mostrando ${produtosPaginados.length} de ${produtos.length} materiais cadastrados`
+                )}
+                {termoBusca && ` para a busca "${termoBusca}"`}
+              </span>
+            </div>
+
+            <div className={styles.controlsGroup}>
+              {/* Filtro de Categoria em Dropdown */}
+              <div className={styles.controlSelectWrapper}>
+                <Layers size={16} className={styles.controlIcon} />
+                <label htmlFor="categorySelect">Categoria:</label>
+                <select 
+                  id="categorySelect" 
+                  className={styles.controlSelect}
+                  value={categoriaAtiva}
+                  onChange={(e) => {
+                    setCategoriaAtiva(e.target.value);
+                    setPaginaAtual(1);
+                  }}
+                >
+                  {CATEGORIAS.map((cat) => {
+                    const count = contagemPorCategoria[cat.id] || 0;
+                    return (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.label} {count > 0 ? `(${count})` : ''}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+
+              {/* Ordenação */}
+              <div className={styles.controlSelectWrapper}>
+                <SlidersHorizontal size={16} className={styles.controlIcon} />
+                <label htmlFor="sortSelect">Ordenar:</label>
+                <select 
+                  id="sortSelect" 
+                  className={styles.controlSelect}
+                  value={ordenacao}
+                  onChange={(e) => setOrdenacao(e.target.value)}
+                >
+                  <option value="destaque">Mais Cotados / Destaques</option>
+                  <option value="nome-asc">Nome do Produto (A - Z)</option>
+                  <option value="nome-desc">Nome do Produto (Z - A)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Grid de Cards dos Produtos Paginados */}
+          {produtos.length === 0 && !carregando ? (
+            <div className={styles.emptySearchBox}>
+              <PackageOpen size={48} className={styles.emptySearchIcon} />
+              <h3>Nenhum material encontrado</h3>
+              <p>Não encontramos produtos para "{termoBusca}" nesta categoria.</p>
+              <button 
+                className={styles.btnClearFilters}
+                onClick={() => { setTermoBusca(''); setCategoriaAtiva('todos'); }}
+              >
+                Limpar Filtros e Ver Todos
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className={styles.productsGrid}>
+                {produtosPaginados.map((produto) => (
+                  <ProductCard 
+                    key={produto.id}
+                    produto={produto}
+                    onAdicionarCotacao={handleAdicionarCotacao}
+                    quantidadeNoCarrinho={mapQuantidades[produto.id] || 0}
+                  />
+                ))}
+              </div>
+
+              {/* Componente de Paginação */}
+              <Pagination 
+                paginaAtual={paginaAtual}
+                totalPaginas={totalPaginas}
+                totalItens={produtos.length}
+                itensPorPagina={itensPorPagina}
+                setItensPorPagina={setItensPorPagina}
+                onMudarPagina={handleMudarPagina}
+              />
+            </>
+          )}
+        </div>
+      </main>
+
+      {/* Gaveta Lateral de Cotação */}
+      <QuoteDrawer 
+        aberto={drawerAberto}
+        onClose={() => setDrawerAberto(false)}
+        itensCotacao={itensCotacao}
+        onAtualizarQuantidade={handleAtualizarQuantidade}
+        onRemoverItem={handleRemoverItem}
+        onLimparCotacao={handleLimparCotacao}
+      />
+
+      {/* Rodapé */}
+      <Footer />
+    </div>
+  );
+}

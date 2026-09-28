@@ -1,0 +1,40 @@
+.productVisualWrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.productVisualCanvas {
+  width: 100%;
+  height: 100%;
+  max-width: 140px;
+  max-height: 105px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.productVisualCanvas svg {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+}
+
+.productSpecBadge {
+  position: absolute;
+  bottom: 0;
+  background-color: rgba(15, 23, 42, 0.75);
+  color: #FFFFFF;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  backdrop-filter: blur(4px);
+}

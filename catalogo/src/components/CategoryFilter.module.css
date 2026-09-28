@@ -1,0 +1,72 @@
+.categoryFilterWrapper {
+  background-color: var(--light-surface);
+  border-bottom: 1px solid var(--border-light);
+  padding: 14px 0;
+  position: sticky;
+  top: 98px;
+  z-index: 40;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.categoryScrollContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+}
+
+.categoryScrollContainer::-webkit-scrollbar {
+  height: 4px;
+}
+
+.categoryScrollContainer::-webkit-scrollbar-thumb {
+  background: var(--border-medium);
+  border-radius: 4px;
+}
+
+.categoryPillBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  background-color: var(--light-subtle);
+  border: 1px solid var(--border-light);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--transition-fast);
+}
+
+.categoryPillBtn:hover {
+  background-color: #E2E8F0;
+  color: var(--text-main);
+}
+
+.categoryPillBtn.active {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(255, 102, 0, 0.3);
+}
+
+.pillLabel {
+  font-size: 0.85rem;
+}
+
+.pillCount {
+  background-color: rgba(0, 0, 0, 0.08);
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.categoryPillBtn.active .pillCount {
+  background-color: rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
+}

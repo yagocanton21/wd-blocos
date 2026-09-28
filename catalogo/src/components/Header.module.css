@@ -1,0 +1,354 @@
+.siteHeader {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: var(--dark-bg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Faixa Superior */
+.topBanner {
+  background-color: #090D16;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.78rem;
+  color: var(--text-light);
+  padding: 6px 0;
+}
+
+.topBannerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.topBannerItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.bannerIcon {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.deliveryText {
+  color: var(--text-light);
+}
+
+.topBannerRight {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.btnAdminTop {
+  background: none;
+  border: none;
+  color: var(--text-light);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-fast);
+}
+
+.btnAdminTop:hover {
+  color: #FFFFFF;
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.adminShieldIcon {
+  color: var(--primary);
+}
+
+/* Barra Principal */
+.mainHeader {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--dark-border);
+}
+
+.headerContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.brandGroup {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.brandLink {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.brandLogo {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+}
+
+.brandTitle {
+  color: var(--text-white);
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.brandSubtitle {
+  color: var(--primary);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+/* Campo de Busca */
+.searchWrapper {
+  position: relative;
+  flex: 1;
+  max-width: 540px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94A3B8;
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  background-color: var(--dark-surface);
+  border: 1px solid var(--dark-border);
+  color: var(--text-white);
+  padding: 11px 40px 11px 44px;
+  border-radius: var(--radius-full);
+  font-size: 0.92rem;
+  transition: var(--transition-fast);
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  background-color: #172033;
+  box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.15);
+}
+
+.searchInput::placeholder {
+  color: #64748B;
+}
+
+.clearSearchBtn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-light);
+  cursor: pointer;
+  padding: 4px;
+  font-size: 0.85rem;
+}
+
+/* Ações do Topo */
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.btnWhatsappHeader {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #22C55E;
+  color: #FFFFFF;
+  padding: 9px 16px;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btnWhatsappHeader:hover {
+  background-color: #16A34A;
+  transform: translateY(-1px);
+}
+
+.btnCartHeader {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background-color: var(--dark-surface);
+  border: 1px solid var(--dark-border);
+  color: var(--text-white);
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.btnCartHeader:hover,
+.btnCartHeader.active {
+  border-color: var(--primary);
+  background-color: #26334D;
+}
+
+.cartIconWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cartBadgeCount {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background-color: var(--primary);
+  color: #FFFFFF;
+  font-size: 0.7rem;
+  font-weight: 800;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.cartTextWrapper {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.cartTitle {
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.cartSubtitle {
+  font-size: 0.7rem;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* Responsividade Mobile & Tablet */
+@media (max-width: 860px) {
+  .btnLabelDesktop {
+    display: none;
+  }
+
+  .btnWhatsappHeader {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border-radius: 50%;
+  }
+
+  .headerContainer {
+    flex-wrap: wrap;
+    row-gap: 12px;
+    column-gap: 10px;
+  }
+
+  .brandGroup {
+    order: 1;
+  }
+
+  .headerActions {
+    order: 2;
+    gap: 8px;
+  }
+
+  /* O campo de busca vai para a linha 2 e ocupa 100% da largura da tela */
+  .searchWrapper {
+    order: 3;
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    margin-top: 2px;
+  }
+
+  .searchInput {
+    height: 44px;
+    font-size: 1rem; /* 16px evita zoom automático no iOS */
+    padding: 10px 42px 10px 44px;
+    border-radius: var(--radius-md);
+  }
+}
+
+@media (max-width: 600px) {
+  .clockItem {
+    display: none;
+  }
+
+  .deliveryText {
+    font-size: 0.73rem;
+  }
+
+  .brandLogo {
+    width: 36px;
+    height: 36px;
+  }
+
+  .brandTitle {
+    font-size: 1.1rem;
+  }
+
+  .brandSubtitle {
+    font-size: 0.58rem;
+  }
+
+  .btnCartHeader {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .cartSubtitle {
+    display: none;
+  }
+}
+
+@media (max-width: 400px) {
+  .cartTitle {
+    display: none;
+  }
+
+  .btnCartHeader {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 50%;
+  }
+}
