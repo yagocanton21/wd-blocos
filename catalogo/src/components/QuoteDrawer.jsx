@@ -14,6 +14,14 @@ import { INFO_EMPRESA } from '../data/produtos';
 import ProductVisual from './ProductVisual';
 import styles from './QuoteDrawer.module.css';
 
+const formatarUnidade = (qtd, un) => {
+  if (un === 'saco') return qtd > 1 ? 'sacos' : 'saco';
+  if (un === 'un') return qtd > 1 ? 'unidades' : 'unidade';
+  if (un === 'painel') return qtd > 1 ? 'painéis' : 'painel';
+  if (un === 'bisnaga') return qtd > 1 ? 'bisnagas' : 'bisnaga';
+  return un || 'unidades';
+};
+
 export default function QuoteDrawer({ 
   aberto, 
   onClose, 
@@ -63,7 +71,7 @@ export default function QuoteDrawer({
     mensagem += `\n📦 *LISTA DE MATERIAIS (${itensCotacao.length} itens):*\n`;
 
     itensCotacao.forEach((item, idx) => {
-      mensagem += `\n${idx + 1}. *${item.quantidade} ${item.produto.unidade}* — ${item.produto.nome}`;
+      mensagem += `\n${idx + 1}. *${item.quantidade} ${formatarUnidade(item.quantidade, item.produto.unidade)}* — ${item.produto.nome}`;
       mensagem += `\n   ↳ Cód: ${item.produto.codigo} | Medida: ${item.produto.dimensoes}`;
       if (item.produto.resistencia && item.produto.resistencia !== 'Livre de impurezas') {
         mensagem += ` | Resistência: ${item.produto.resistencia}`;
@@ -137,7 +145,7 @@ export default function QuoteDrawer({
 
                       {/* Controles de Quantidade */}
                       <div className={styles.drawerQtyRow}>
-                        <span className={styles.drawerQtyUnit}>{item.produto.unidade}:</span>
+                        <span className={styles.drawerQtyUnit}>Qtd ({formatarUnidade(2, item.produto.unidade)}):</span>
                         <div className={styles.drawerStepper}>
                           <button 
                             type="button" 

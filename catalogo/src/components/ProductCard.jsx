@@ -33,10 +33,18 @@ export default function ProductCard({
     }, 1200);
   };
 
+  const formatarUnidade = (qtd, un) => {
+    if (un === 'saco') return qtd > 1 ? 'sacos' : 'saco';
+    if (un === 'un') return qtd > 1 ? 'unidades' : 'unidade';
+    if (un === 'painel') return qtd > 1 ? 'painéis' : 'painel';
+    if (un === 'bisnaga') return qtd > 1 ? 'bisnagas' : 'bisnaga';
+    return un || 'unidades';
+  };
+
   // Linha de especificações essenciais resumida
   const specText = [
     produto.categoriaLabel,
-    `Mín: ${produto.qtdMinima} ${produto.unidade || 'un'}`
+    `Mín: ${produto.qtdMinima} ${formatarUnidade(produto.qtdMinima, produto.unidade)}`
   ].filter(Boolean).join(' • ');
 
   return (
@@ -83,7 +91,7 @@ export default function ProductCard({
               type="button" 
               className={styles.stepperBtn} 
               onClick={handleDiminuir}
-              title={`Diminuir ${incremento} ${produto.unidade}`}
+              title={`Diminuir ${incremento} ${formatarUnidade(incremento, produto.unidade)}`}
             >
               <Minus size={14} />
             </button>
@@ -103,7 +111,7 @@ export default function ProductCard({
               type="button" 
               className={styles.stepperBtn} 
               onClick={handleAumentar}
-              title={`Aumentar ${incremento} ${produto.unidade}`}
+              title={`Aumentar ${incremento} ${formatarUnidade(incremento, produto.unidade)}`}
             >
               <Plus size={14} />
             </button>
