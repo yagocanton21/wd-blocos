@@ -5,7 +5,8 @@ import QuoteDrawer from './components/QuoteDrawer';
 import Pagination from './components/Pagination';
 import AdminPanel from './components/AdminPanel';
 import Footer from './components/Footer';
-import { getProdutos, getCategorias } from './services/api';
+import { getProdutos, getCategorias, getConfig } from './services/api';
+import { INFO_EMPRESA } from './data/produtos';
 import { SlidersHorizontal, PackageOpen, Layers } from 'lucide-react';
 import styles from './App.module.css';
 
@@ -40,11 +41,23 @@ export default function App() {
   });
 
   const [drawerAberto, setDrawerAberto] = useState(false);
+  const [toast, setToast] = useState({ visivel: false, mensagem: '' });
+  const [configLoja, setConfigLoja] = useState({ telefone_whatsapp: '5511942440440', telefone_exibicao: '(11) 94244-0440' });
+  
+  const mostrarToast = (mensagem) => {
+    setToast({ visivel: true, mensagem });
+    setTimeout(() => {
+      setToast(prev => ({ ...prev, visivel: false }));
+    }, 3000);
+  };
 
   // Carrega produtos e categorias do PostgreSQL
   const carregarDados = async () => {
     setCarregando(true);
     try {
+      const cfg = await getConfig();
+      setConfigLoja(cfg);
+      
       const listaProdutos = await getProdutos({
         categoria: categoriaAtiva,
         busca: termoBuscaDebounced,
@@ -128,6 +141,7 @@ export default function App() {
         return [...prev, { produto, quantidade }];
       }
     });
+    mostrarToast(`✅ ${produto.nome} adicionado à lista!`);
   };
 
   const handleAtualizarQuantidade = (produtoId, novaQuantidade) => {
@@ -175,6 +189,27 @@ export default function App() {
   // MODO CATÁLOGO PÚBLICO
   return (
     <div className={styles.appRoot}>
+      {/* Toast Notification */}
+      {toast.visivel && (
+        <div style={{
+          position: 'fixed',
+          top: '80px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          backgroundColor: '#22c55e',
+          color: '#ffffff',
+          padding: '12px 24px',
+          borderRadius: '8px',
+          fontWeight: 'bold',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          zIndex: 9999,
+          animation: 'slideDown 0.3s ease-out',
+          textAlign: 'center'
+        }}>
+          {toast.mensagem}
+        </div>
+      )}
+
       {/* Cabeçalho */}
       <Header 
         termoBusca={termoBusca}
@@ -182,6 +217,7 @@ export default function App() {
         totalItensCotacao={totalItens}
         onAbrirCotacao={() => setDrawerAberto(true)}
         onAbrirAdmin={() => setModoAdmin(true)}
+        configLoja={configLoja}
       />
 
       {/* Conteúdo Principal do Catálogo */}
@@ -254,15 +290,38 @@ export default function App() {
           {/* Grid de Cards dos Produtos Paginados */}
           {produtos.length === 0 && !carregando ? (
             <div className={styles.emptySearchBox}>
-              <PackageOpen size={48} className={styles.emptySearchIcon} />
-              <h3>Nenhum material encontrado</h3>
-              <p>Não encontramos produtos para "{termoBusca}" nesta categoria.</p>
-              <button 
-                className={styles.btnClearFilters}
-                onClick={() => { setTermoBusca(''); setCategoriaAtiva('todos'); }}
-              >
-                Limpar Filtros e Ver Todos
-              </button>
+              <PackageOpen size={48} className={styles.emptySearchIcon} style={{ marginBottom: '16px', color: '#94a3b8' }} />
+              <h3>Poxa, não encontramos o que você procura...</h3>
+              <p>
+                Ainda não temos <strong>"{termoBusca}"</strong> cadastrado nesta categoria. 
+                Mas não se preocupe! Mande um WhatsApp para a nossa equipe que nós conferimos o estoque ou fazemos sob encomenda!
+              </p>
+              <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginTop: '24px' }}>
+                <button 
+                  className={styles.btnClearFilters}
+                  onClick={() => { setTermoBusca(''); setCategoriaAtiva('todos'); }}
+                >
+                  Limpar Filtros
+                </button>
+                <a 
+                  href={`https://wa.me/${configLoja.telefone_whatsapp}?text=${encodeURIComponent(`Olá, tentei procurar por "${termoBusca}" no site de vocês mas não encontrei. Vocês trabalham com esse material?`)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    backgroundColor: '#16a34a',
+                    color: 'white',
+                    padding: '10px 24px',
+                    borderRadius: '8px',
+                    textDecoration: 'none',
+                    fontWeight: 'bold',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  Perguntar no WhatsApp
+                </a>
+              </div>
             </div>
           ) : (
             <>
@@ -299,10 +358,11 @@ export default function App() {
         onAtualizarQuantidade={handleAtualizarQuantidade}
         onRemoverItem={handleRemoverItem}
         onLimparCotacao={handleLimparCotacao}
+        configLoja={configLoja}
       />
 
       {/* Rodapé */}
-      <Footer />
+      <Footer configLoja={configLoja} />
     </div>
   );
 }

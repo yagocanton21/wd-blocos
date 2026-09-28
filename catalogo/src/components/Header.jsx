@@ -8,9 +8,10 @@ export default function Header({
   setTermoBusca, 
   totalItensCotacao, 
   onAbrirCotacao,
-  onAbrirAdmin 
+  onAbrirAdmin,
+  configLoja
 }) {
-  const linkWhatsApp = `https://wa.me/${INFO_EMPRESA.telefoneWhatsapp}?text=${encodeURIComponent('Olá! Acessei o catálogo digital da WD Blocos e gostaria de tirar uma dúvida.')}`;
+  const linkWhatsApp = `https://wa.me/${configLoja?.telefone_whatsapp || INFO_EMPRESA.telefoneWhatsapp}?text=${encodeURIComponent('Olá! Acessei o catálogo digital da WD Blocos e gostaria de tirar uma dúvida.')}`;
 
   return (
     <header className={styles.siteHeader}>

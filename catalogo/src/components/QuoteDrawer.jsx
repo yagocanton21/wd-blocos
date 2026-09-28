@@ -28,7 +28,8 @@ export default function QuoteDrawer({
   itensCotacao, 
   onAtualizarQuantidade, 
   onRemoverItem, 
-  onLimparCotacao 
+  onLimparCotacao,
+  configLoja
 }) {
   const [nomeCliente, setNomeCliente] = useState('');
   const [localEntrega, setLocalEntrega] = useState('');
@@ -81,7 +82,8 @@ export default function QuoteDrawer({
     mensagem += `\n\n─────────────────\n`;
     mensagem += `Por favor, informar valores com frete e previsão de entrega. Aguardo retorno!`;
 
-    const urlZap = `https://wa.me/${INFO_EMPRESA.telefoneWhatsapp}?text=${encodeURIComponent(mensagem)}`;
+    const telefoneWhatsapp = configLoja?.telefone_whatsapp || INFO_EMPRESA.telefoneWhatsapp;
+    const urlZap = `https://wa.me/${telefoneWhatsapp}?text=${encodeURIComponent(mensagem)}`;
     window.open(urlZap, '_blank');
   };
 

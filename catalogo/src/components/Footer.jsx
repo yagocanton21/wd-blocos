@@ -3,8 +3,11 @@ import { MessageSquare, MapPin, ExternalLink } from 'lucide-react';
 import { INFO_EMPRESA } from '../data/produtos';
 import styles from './Footer.module.css';
 
-export default function Footer() {
-  const linkWhatsApp = `https://wa.me/${INFO_EMPRESA.telefoneWhatsapp}?text=${encodeURIComponent('Olá! Acessei o catálogo digital da WD Blocos e gostaria de solicitar um orçamento.')}`;
+export default function Footer({ configLoja }) {
+  const telefoneWhatsapp = configLoja?.telefone_whatsapp || INFO_EMPRESA.telefoneWhatsapp;
+  const telefoneExibicao = configLoja?.telefone_exibicao || INFO_EMPRESA.telefoneExibicao;
+
+  const linkWhatsApp = `https://wa.me/${telefoneWhatsapp}?text=${encodeURIComponent('Olá! Acessei o catálogo digital da WD Blocos e gostaria de solicitar um orçamento.')}`;
   const mapEmbedUrl = `https://maps.google.com/maps?q=${encodeURIComponent('Av. Tiradentes, 21 - Centro, Bom Jesus dos Perdões - SP, 12955-025')}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
 
   return (
@@ -35,7 +38,7 @@ export default function Footer() {
                     rel="noopener noreferrer" 
                     className={styles.zapNumber}
                   >
-                    {INFO_EMPRESA.telefoneExibicao}
+                    {telefoneExibicao}
                     <span className={styles.clickHint}>(Clique para conversar)</span>
                   </a>
                 </div>

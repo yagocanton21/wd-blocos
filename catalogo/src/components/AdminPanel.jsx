@@ -13,7 +13,9 @@ import {
   Check, 
   SlidersHorizontal,
   ChevronLeft,
-  ChevronRight 
+  ChevronRight,
+  Settings,
+  Tag
 } from 'lucide-react';
 import { 
   getProdutos, 
@@ -28,7 +30,9 @@ import {
   criarCategoria,
   atualizarCategoria,
   excluirCategoria,
-  uploadImage
+  uploadImage,
+  getConfig,
+  updateConfig
 } from '../services/api';
 import styles from './AdminPanel.module.css';
 
@@ -85,6 +89,10 @@ export default function AdminPanel({ onVoltarCatalogo }) {
   const [salvando, setSalvando] = useState(false);
   const [fazendoUpload, setFazendoUpload] = useState(false);
 
+  // Configurações da Loja
+  const [configLoja, setConfigLoja] = useState({ telefone_whatsapp: '', telefone_exibicao: '' });
+  const [salvandoConfig, setSalvandoConfig] = useState(false);
+
   // Carrega dados do PostgreSQL
   const carregarDados = async () => {
     try {
@@ -96,6 +104,9 @@ export default function AdminPanel({ onVoltarCatalogo }) {
 
       const metricas = await getStats();
       setStats(metricas);
+
+      const config = await getConfig();
+      setConfigLoja(config);
     } catch (e) {
       console.error('Erro ao carregar dados do admin:', e);
     }
@@ -298,6 +309,20 @@ export default function AdminPanel({ onVoltarCatalogo }) {
     }
   };
 
+  const handleSalvarConfig = async (e) => {
+    e.preventDefault();
+    setSalvandoConfig(true);
+    try {
+      const novaConfig = await updateConfig(configLoja);
+      setConfigLoja(novaConfig);
+      alert('Configurações salvas com sucesso!');
+    } catch (err) {
+      alert('Erro ao salvar configurações.');
+    } finally {
+      setSalvandoConfig(false);
+    }
+  };
+
   // SE NÃO AUTENTICADO: Tela de Login
   if (!autenticado) {
     return (
@@ -425,6 +450,13 @@ export default function AdminPanel({ onVoltarCatalogo }) {
             onClick={() => setAbaAtiva('categorias')}
           >
             Gerenciar Categorias
+          </button>
+          <button 
+            type="button" 
+            className={abaAtiva === 'config' ? styles.btnSave : styles.btnCancel}
+            onClick={() => setAbaAtiva('config')}
+          >
+            Configurações da Loja
           </button>
         </div>
 
@@ -706,7 +738,49 @@ export default function AdminPanel({ onVoltarCatalogo }) {
               )}
 
             </div>
+            </div>
           </>
+        )}
+
+        {abaAtiva === 'config' && (
+          <div className={styles.tableCard} style={{ padding: '24px', maxWidth: '600px', margin: '0 auto' }}>
+            <h3 style={{ marginTop: 0, marginBottom: '24px', color: '#1E293B' }}>Configurações Gerais da Loja</h3>
+            <form onSubmit={handleSalvarConfig}>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>WhatsApp para Vendas (Somente números)</label>
+                <input 
+                  type="text" 
+                  className={styles.formInput} 
+                  value={configLoja.telefone_whatsapp}
+                  onChange={e => setConfigLoja({...configLoja, telefone_whatsapp: e.target.value.replace(/\D/g, '')})}
+                  placeholder="Ex: 5511999999999"
+                  required
+                />
+                <small style={{ color: '#64748B', display: 'block', marginTop: '4px' }}>Inclua o 55 (Brasil) e o DDD. Ex: 5511999999999</small>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Telefone para Exibição (Como aparece pro cliente)</label>
+                <input 
+                  type="text" 
+                  className={styles.formInput} 
+                  value={configLoja.telefone_exibicao}
+                  onChange={e => setConfigLoja({...configLoja, telefone_exibicao: e.target.value})}
+                  placeholder="Ex: (11) 99999-9999"
+                  required
+                />
+              </div>
+
+              <button 
+                type="submit" 
+                className={styles.btnSave} 
+                style={{ width: '100%', marginTop: '12px' }}
+                disabled={salvandoConfig}
+              >
+                {salvandoConfig ? 'Salvando...' : 'Salvar Configurações'}
+              </button>
+            </form>
+          </div>
         )}
       </main>
 

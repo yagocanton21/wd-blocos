@@ -10,6 +10,8 @@ from .models.category import Category
 from .routers import products_router, stats_router, auth_router
 from .routers.categories import router as categories_router
 from .routers.upload import router as upload_router
+from .routers.config import router as config_router
+from .models.config import StoreConfig
 import os
 
 logging.basicConfig(level=logging.INFO)
@@ -50,6 +52,7 @@ app.include_router(stats_router)
 app.include_router(auth_router)
 app.include_router(categories_router)
 app.include_router(upload_router)
+app.include_router(config_router)
 
 # Servir arquivos de upload estaticamente
 UPLOAD_DIR = "/app/uploads"

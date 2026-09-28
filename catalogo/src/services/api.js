@@ -190,3 +190,29 @@ export async function excluirCategoria(id) {
   if (!res.ok) throw new Error('Erro ao excluir categoria');
   // 204 No Content não tem json no corpo
 }
+
+// ==========================================
+// CONFIGURAÇÕES DA LOJA
+// ==========================================
+export async function getConfig() {
+  try {
+    const res = await fetch(`${API_BASE}/config`, { cache: 'no-store' });
+    if (!res.ok) throw new Error();
+    return await res.json();
+  } catch (err) {
+    return {
+      telefone_whatsapp: '5511942440440',
+      telefone_exibicao: '(11) 94244-0440'
+    };
+  }
+}
+
+export async function updateConfig(dados) {
+  const res = await fetch(`${API_BASE}/config`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dados)
+  });
+  if (!res.ok) throw new Error('Erro ao salvar configurações');
+  return await res.json();
+}
