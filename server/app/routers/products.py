@@ -16,9 +16,13 @@ def list_products(
     categoria: Optional[str] = Query(None, description="Filtrar por categoria"),
     busca: Optional[str] = Query(None, description="Termo de busca"),
     ordenacao: Optional[str] = Query("destaque", description="Critério de ordenação"),
+    admin: Optional[bool] = Query(False, description="Se true, retorna também os inativos"),
     db: Session = Depends(get_db)
 ):
     query = db.query(Product)
+
+    if not admin:
+        query = query.filter(Product.ativo == True)
 
     if categoria and categoria != "todos":
         query = query.filter(Product.categoria == categoria)
@@ -136,6 +140,20 @@ def toggle_availability(product_id: str, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(product)
     return {"id": product.id, "prontaEntrega": product.pronta_entrega}
+
+@router.patch("/{product_id}/toggle-ativo")
+def toggle_product_ativo(product_id: str, db: Session = Depends(get_db)):
+    product = db.query(Product).filter(Product.id == product_id).first()
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Produto não encontrado"
+        )
+    
+    product.ativo = not product.ativo
+    db.commit()
+    db.refresh(product)
+    return {"id": product.id, "ativo": product.ativo}
 
 @router.delete("/{product_id}")
 def delete_product(product_id: str, db: Session = Depends(get_db)):

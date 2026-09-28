@@ -22,6 +22,7 @@ class ProductBase(BaseModel):
     aplicacoes: Optional[List[str]] = []
     tipoIcone: Optional[str] = Field(default="bloco-padrao", alias="tipo_icone")
     imagemUrl: Optional[str] = Field(default=None, alias="imagem_url")
+    ativo: Optional[bool] = True
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -52,6 +53,7 @@ class ProductUpdate(BaseModel):
     aplicacoes: Optional[List[str]] = None
     tipoIcone: Optional[str] = Field(default=None, alias="tipo_icone")
     imagemUrl: Optional[str] = Field(default=None, alias="imagem_url")
+    ativo: Optional[bool] = None
 
     model_config = ConfigDict(
         populate_by_name=True,

@@ -35,7 +35,8 @@ const normalizarProduto = (p) => ({
   descricaoCurta: p.descricaoCurta || p.descricao_curta || '',
   descricaoLonga: p.descricaoLonga || p.descricao_longa || '',
   aplicacoes: p.aplicacoes || [],
-  tipoIcone: p.tipoIcone || p.tipo_icone || 'bloco-padrao'
+  tipoIcone: p.tipoIcone || p.tipo_icone || 'bloco-padrao',
+  ativo: p.ativo !== false
 });
 
 // Busca produtos da API FastAPI
@@ -45,6 +46,7 @@ export async function getProdutos(filtros = {}) {
     if (filtros.categoria && filtros.categoria !== 'todos') params.append('categoria', filtros.categoria);
     if (filtros.busca) params.append('busca', filtros.busca);
     if (filtros.ordenacao) params.append('ordenacao', filtros.ordenacao);
+    if (filtros.admin) params.append('admin', 'true');
 
     const res = await fetch(`${API_BASE}/produtos?${params.toString()}`, { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -115,6 +117,14 @@ export async function alternarProntaEntrega(id) {
     method: 'PATCH'
   });
   if (!res.ok) throw new Error('Erro ao alternar disponibilidade');
+  return await res.json();
+}
+
+export async function alternarAtivo(id) {
+  const res = await fetch(`${API_BASE}/produtos/${id}/toggle-ativo`, {
+    method: 'PATCH'
+  });
+  if (!res.ok) throw new Error('Erro ao alternar status ativo');
   return await res.json();
 }
 

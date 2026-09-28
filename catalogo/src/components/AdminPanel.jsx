@@ -21,6 +21,7 @@ import {
   criarProduto, 
   atualizarProduto, 
   alternarProntaEntrega, 
+  alternarAtivo,
   excluirProduto, 
   loginAdmin,
   getCategorias,
@@ -47,6 +48,7 @@ const PRODUTO_VAZIO = {
   qtdMinima: 10,
   incremento: 10,
   prontaEntrega: true,
+  ativo: true,
   descricaoCurta: '',
   descricaoLonga: '',
   aplicacoes: ['Alvenaria estrutural', 'Obras residenciais e comerciais'],
@@ -85,7 +87,7 @@ export default function AdminPanel({ onVoltarCatalogo }) {
   // Carrega dados do PostgreSQL
   const carregarDados = async () => {
     try {
-      const lista = await getProdutos({ busca: termoBusca, categoria: categoriaFiltro });
+      const lista = await getProdutos({ busca: termoBusca, categoria: categoriaFiltro, admin: true });
       setProdutos(lista);
       
       const listaCat = await getCategorias();
@@ -193,6 +195,15 @@ export default function AdminPanel({ onVoltarCatalogo }) {
   const handleToggleDisponibilidade = async (id) => {
     try {
       await alternarProntaEntrega(id);
+      await carregarDados();
+    } catch (err) {
+      alert('Erro ao alternar status do produto no banco.');
+    }
+  };
+
+  const handleToggleAtivo = async (id) => {
+    try {
+      await alternarAtivo(id);
       await carregarDados();
     } catch (err) {
       alert('Erro ao alternar status do produto no banco.');
@@ -457,7 +468,7 @@ export default function AdminPanel({ onVoltarCatalogo }) {
                   <th className={styles.colCodigo}>Código</th>
                   <th className={styles.colMaterial}>Material & Dimensões</th>
                   <th className={styles.colCategoria}>Categoria</th>
-                  <th className={styles.colResistencia}>Resistência</th>
+                  <th className={styles.colStatus}>Status (Visibilidade)</th>
                   <th className={styles.colAcoes}>Ações</th>
                 </tr>
               </thead>
@@ -482,7 +493,17 @@ export default function AdminPanel({ onVoltarCatalogo }) {
                       </td>
                       <td>{p.categoriaLabel}</td>
                       <td>
-                        <strong style={{ color: 'var(--primary)' }}>{p.resistencia || '—'}</strong>
+                        <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '8px' }}>
+                          <input 
+                            type="checkbox" 
+                            checked={p.ativo}
+                            onChange={() => handleToggleAtivo(p.id)}
+                            style={{ cursor: 'pointer', width: '16px', height: '16px' }}
+                          />
+                          <span style={{ fontSize: '0.85rem', color: p.ativo ? '#16a34a' : '#ef4444', fontWeight: 'bold' }}>
+                            {p.ativo ? 'ATIVO' : 'OCULTO'}
+                          </span>
+                        </label>
                       </td>
                       <td>
                         <div className={styles.actionsCell}>

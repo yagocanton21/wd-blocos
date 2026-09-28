@@ -26,5 +26,6 @@ class Product(Base):
     aplicacoes = Column(JSON, default=list)
     tipo_icone = Column(String(50), default="bloco-padrao")
     imagem_url = Column(String(500), nullable=True)
+    ativo = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
