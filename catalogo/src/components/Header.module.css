@@ -146,6 +146,7 @@
   border-radius: var(--radius-full);
   font-size: 0.92rem;
   transition: var(--transition-fast);
+  text-overflow: ellipsis;
 }
 
 .searchInput:focus {
@@ -157,6 +158,7 @@
 
 .searchInput::placeholder {
   color: #64748B;
+  text-overflow: ellipsis;
 }
 
 .clearSearchBtn {
