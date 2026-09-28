@@ -123,11 +123,24 @@ export default function QuoteDrawer({
                 {itensCotacao.map((item) => (
                   <div key={item.produto.id} className={styles.drawerItemCard}>
                     <div className={styles.drawerItemVisual}>
-                      <ProductVisual 
-                        tipo={item.produto.tipoIcone} 
-                        dimensao="" 
-                        nome="" 
-                      />
+                      {item.produto.imagemUrl ? (
+                        <img 
+                          src={item.produto.imagemUrl} 
+                          alt={item.produto.nome}
+                          style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.nextSibling.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <div style={item.produto.imagemUrl ? { display: 'none', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' } : { width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <ProductVisual 
+                          tipo={item.produto.tipoIcone} 
+                          dimensao="" 
+                          nome="" 
+                        />
+                      </div>
                     </div>
 
                     <div className={styles.drawerItemDetails}>
