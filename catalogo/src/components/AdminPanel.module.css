@@ -488,9 +488,10 @@
   backdrop-filter: blur(4px);
   z-index: 100;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 20px;
+  padding: 40px 20px;
+  overflow-y: auto;
 }
 
 .formModal {
@@ -499,11 +500,10 @@
   border-radius: var(--radius-lg);
   width: 100%;
   max-width: 680px;
-  max-height: 90vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  margin-bottom: 40px;
 }
 
 .modalHeader {
@@ -534,13 +534,11 @@
 .modalForm {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
   flex: 1;
 }
 
 .modalBody {
   padding: 24px;
-  overflow-y: auto;
   flex: 1;
 }
 
@@ -607,6 +605,9 @@
   gap: 12px;
   background-color: #131C31;
   flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
 }
 
 .btnCancel {
@@ -722,5 +723,16 @@
   }
   .formGridFull {
     grid-column: span 1;
+  }
+  
+  .modalBackdrop {
+    padding: 0;
+  }
+  .formModal {
+    max-width: 100%;
+    min-height: 100vh;
+    border-radius: 0;
+    margin-bottom: 0;
+    border: none;
   }
 }
