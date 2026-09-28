@@ -658,7 +658,8 @@ export default function AdminPanel({ onVoltarCatalogo }) {
             </div>
 
             <form onSubmit={handleSalvarProduto} className={styles.modalForm}>
-              <div className={styles.formGrid}>
+              <div className={styles.modalBody}>
+                <div className={styles.formGrid}>
                 {/* Nome do Produto */}
                 <div className={`${styles.formGroup} ${styles.formGridFull}`}>
                   <label className={styles.formLabel}>Nome do Material / Produto *</label>
@@ -839,6 +840,7 @@ export default function AdminPanel({ onVoltarCatalogo }) {
                   </div>
                 </div>
               </div>
+              </div>
 
               <div className={styles.modalFooter}>
                 <button 
@@ -879,7 +881,8 @@ export default function AdminPanel({ onVoltarCatalogo }) {
             </div>
 
             <form onSubmit={handleSalvarCategoria} className={styles.modalForm}>
-              <div className={styles.formGrid}>
+              <div className={styles.modalBody}>
+                <div className={styles.formGrid}>
                 <div className={`${styles.formGroup} ${styles.formGridFull}`}>
                   <label className={styles.formLabel}>Nome da Categoria *</label>
                   <input 
@@ -890,6 +893,7 @@ export default function AdminPanel({ onVoltarCatalogo }) {
                     onChange={(e) => setFormCategoria({ ...formCategoria, label: e.target.value })}
                     required 
                   />
+                </div>
                 </div>
               </div>
 
