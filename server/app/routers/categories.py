@@ -7,7 +7,7 @@ from ..models.category import Category
 from ..schemas.category import CategoryCreate, CategoryUpdate, CategoryResponse
 
 router = APIRouter(
-    prefix="/categories",
+    prefix="/api/categories",
     tags=["categories"]
 )
 
