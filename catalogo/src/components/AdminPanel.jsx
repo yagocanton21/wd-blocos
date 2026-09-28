@@ -673,18 +673,6 @@ export default function AdminPanel({ onVoltarCatalogo }) {
                   />
                 </div>
 
-                {/* Código */}
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>Código Técnico</label>
-                  <input 
-                    type="text" 
-                    className={styles.formInput} 
-                    value={formDados.codigo}
-                    placeholder="Ex: BE-1439-4.5"
-                    onChange={(e) => setFormDados({ ...formDados, codigo: e.target.value })}
-                  />
-                </div>
-
                 {/* Categoria */}
                 <div className={styles.formGroup}>
                   <label className={styles.formLabel}>Categoria *</label>
@@ -703,53 +691,6 @@ export default function AdminPanel({ onVoltarCatalogo }) {
                     {categorias.map(c => (
                       <option key={c.id} value={c.id}>{c.label}</option>
                     ))}
-                  </select>
-                </div>
-
-                {/* Dimensões */}
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>Dimensões (Medida)</label>
-                  <input 
-                    type="text" 
-                    className={styles.formInput} 
-                    value={formDados.dimensoes}
-                    placeholder="Ex: 14 x 19 x 39 cm"
-                    onChange={(e) => setFormDados({ ...formDados, dimensoes: e.target.value })}
-                  />
-                </div>
-
-                {/* Resistência */}
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>Resistência Mecânica (MPa)</label>
-                  <input 
-                    type="text" 
-                    className={styles.formInput} 
-                    value={formDados.resistencia}
-                    placeholder="Ex: 4.5 MPa ou 35 MPa"
-                    onChange={(e) => setFormDados({ ...formDados, resistencia: e.target.value })}
-                  />
-                </div>
-
-                {/* Tipo de Visual */}
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>Ilustração do Produto</label>
-                  <select 
-                    className={styles.formSelect}
-                    value={formDados.tipoIcone}
-                    onChange={(e) => setFormDados({ ...formDados, tipoIcone: e.target.value })}
-                  >
-                    <option value="bloco-padrao">Bloco Estrutural Padrão (2 furos)</option>
-                    <option value="bloco-largo">Bloco 19cm Largo</option>
-                    <option value="meio-bloco">Meio Bloco</option>
-                    <option value="bloco-fino">Bloco de Vedação Fino (9cm)</option>
-                    <option value="canaleta-u">Canaleta U</option>
-                    <option value="canaleta-j">Canaleta J</option>
-                    <option value="paver-ret">Piso Paver Retangular</option>
-                    <option value="paver-sex">Piso Paver Sextavado</option>
-                    <option value="saco">Saco de Cimento</option>
-                    <option value="agregado">Agregado (Areia / Brita)</option>
-                    <option value="bisnaga">Argamassa Polimérica</option>
-                    <option value="tela-aco">Tela Soldada de Aço</option>
                   </select>
                 </div>
 
@@ -785,23 +726,6 @@ export default function AdminPanel({ onVoltarCatalogo }) {
                   {fazendoUpload && <span style={{ fontSize: '0.8rem', color: '#F97316', marginLeft: '8px' }}>Enviando...</span>}
                 </div>
 
-                {/* Unidade */}
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>Unidade de Medida</label>
-                  <select 
-                    className={styles.formSelect}
-                    value={formDados.unidade}
-                    onChange={(e) => setFormDados({ ...formDados, unidade: e.target.value })}
-                  >
-                    <option value="un">un (Unidade / Peça)</option>
-                    <option value="m²">m² (Metro quadrado)</option>
-                    <option value="saco">saco (Saco 50kg)</option>
-                    <option value="m³">m³ (Metro cúbico)</option>
-                    <option value="painel">painel (Painel/Fardo)</option>
-                    <option value="bisnaga">bisnaga (Bisnaga)</option>
-                  </select>
-                </div>
-
                 {/* Quantidade Mínima */}
                 <div className={styles.formGroup}>
                   <label className={styles.formLabel}>Qtd. Mínima para Cotação</label>
@@ -814,31 +738,7 @@ export default function AdminPanel({ onVoltarCatalogo }) {
                   />
                 </div>
 
-                {/* Passo / Incremento */}
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>Passo / Incremento (+/-)</label>
-                  <input 
-                    type="number" 
-                    className={styles.formInput} 
-                    value={formDados.incremento || 10}
-                    min={1}
-                    onChange={(e) => setFormDados({ ...formDados, incremento: parseInt(e.target.value) || 1 })}
-                  />
-                </div>
 
-                {/* Checkbox Destaque */}
-                <div className={styles.formGridFull}>
-                  <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', paddingTop: '6px' }}>
-                    <label className={styles.formCheckboxGroup}>
-                      <input 
-                        type="checkbox" 
-                        checked={formDados.destaque}
-                        onChange={(e) => setFormDados({ ...formDados, destaque: e.target.checked })}
-                      />
-                      <span>Item em Destaque no Catálogo</span>
-                    </label>
-                  </div>
-                </div>
               </div>
               </div>
 
