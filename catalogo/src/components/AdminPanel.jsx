@@ -891,23 +891,6 @@ export default function AdminPanel({ onVoltarCatalogo }) {
                     required 
                   />
                 </div>
-                
-                <div className={`${styles.formGroup} ${styles.formGridFull}`}>
-                  <label className={styles.formLabel}>
-                    ID / Slug {categoriaEditando ? '(Não editável)' : '(Opcional - gerado automaticamente)'}
-                  </label>
-                  <input 
-                    type="text" 
-                    className={styles.formInput} 
-                    value={formCategoria.id}
-                    placeholder="Ex: blocos-estruturais"
-                    disabled={!!categoriaEditando}
-                    onChange={(e) => setFormCategoria({ ...formCategoria, id: e.target.value })}
-                  />
-                  <small style={{ color: '#64748B', display: 'block', marginTop: '4px' }}>
-                    O ID não pode conter espaços ou caracteres especiais.
-                  </small>
-                </div>
               </div>
 
               <div className={styles.modalFooter} style={{ marginTop: '20px' }}>

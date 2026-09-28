@@ -594,6 +594,14 @@
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+  position: sticky;
+  bottom: -24px;
+  background-color: #131C31;
+  margin-left: -24px;
+  margin-right: -24px;
+  margin-bottom: -24px;
+  margin-top: 24px;
+  z-index: 10;
 }
 
 .btnCancel {

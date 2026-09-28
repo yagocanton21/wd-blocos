@@ -21,29 +21,7 @@ async def lifespan(app: FastAPI):
     logger.info("📦 Inicializando banco de dados PostgreSQL...")
     Base.metadata.create_all(bind=engine)
 
-    db = SessionLocal()
-    try:
-        # Seed inicial de categorias caso vazio
-        cat_count = db.query(Category).count()
-        if cat_count == 0:
-            logger.info("🌱 Populando categorias iniciais...")
-            categorias_iniciais = [
-                Category(id="bloco-estrutural", label="Bloco Estrutural"),
-                Category(id="bloco-vedacao", label="Bloco de Vedação"),
-                Category(id="canaleta", label="Canaletas"),
-                Category(id="piso-intertravado", label="Pisos Intertravados"),
-                Category(id="piso-tatil", label="Piso Tátil")
-            ]
-            db.add_all(categorias_iniciais)
-            db.commit()
-
-        count = db.query(Product).count()
-        logger.info(f"✅ Banco pronto. {count} produto(s) cadastrado(s).")
-    except Exception as e:
-        logger.error(f"❌ Erro ao verificar banco: {e}")
-        db.rollback()
-    finally:
-        db.close()
+    logger.info("✅ Banco pronto. Nenhuma semente inicial gerada por escolha do usuário.")
 
     yield
     logger.info("🛑 Encerrando aplicação FastAPI.")

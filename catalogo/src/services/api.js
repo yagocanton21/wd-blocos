@@ -38,7 +38,7 @@ const normalizarProduto = (p) => ({
   tipoIcone: p.tipoIcone || p.tipo_icone || 'bloco-padrao'
 });
 
-// Busca produtos da API FastAPI com fallback inteligente
+// Busca produtos da API FastAPI
 export async function getProdutos(filtros = {}) {
   try {
     const params = new URLSearchParams();
@@ -51,8 +51,8 @@ export async function getProdutos(filtros = {}) {
     const data = await res.json();
     return Array.isArray(data) ? data.map(normalizarProduto) : [];
   } catch (err) {
-    console.warn('⚠️ Backend FastAPI offline ou indisponível. Usando dados locais.', err);
-    return PRODUTOS_INICIAIS;
+    console.error('⚠️ Backend FastAPI offline ou indisponível.', err);
+    return [];
   }
 }
 
@@ -142,16 +142,14 @@ export async function loginAdmin(username, password) {
 // ==========================================
 // CATEGORIAS
 // ==========================================
-import { CATEGORIAS as CATEGORIAS_FALLBACK } from '../data/produtos';
-
 export async function getCategorias() {
   try {
     const res = await fetch(`${API_BASE}/categories`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
-    console.warn('⚠️ Falha ao buscar categorias. Usando locais.', err);
-    return CATEGORIAS_FALLBACK.filter(c => c.id !== 'todos');
+    console.error('⚠️ Falha ao buscar categorias do backend.', err);
+    return [];
   }
 }
 
