@@ -5,13 +5,13 @@ import QuoteDrawer from './components/QuoteDrawer';
 import Pagination from './components/Pagination';
 import AdminPanel from './components/AdminPanel';
 import Footer from './components/Footer';
-import { CATEGORIAS } from './data/produtos';
-import { getProdutos } from './services/api';
+import { getProdutos, getCategorias } from './services/api';
 import { SlidersHorizontal, PackageOpen, Layers } from 'lucide-react';
 import styles from './App.module.css';
 
 export default function App() {
   const [produtos, setProdutos] = useState([]);
+  const [categorias, setCategorias] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [categoriaAtiva, setCategoriaAtiva] = useState('todos');
   const [termoBusca, setTermoBusca] = useState('');
@@ -41,18 +41,21 @@ export default function App() {
 
   const [drawerAberto, setDrawerAberto] = useState(false);
 
-  // Carrega produtos do PostgreSQL
-  const carregarProdutos = async () => {
+  // Carrega produtos e categorias do PostgreSQL
+  const carregarDados = async () => {
     setCarregando(true);
     try {
-      const lista = await getProdutos({
+      const listaProdutos = await getProdutos({
         categoria: categoriaAtiva,
         busca: termoBuscaDebounced,
         ordenacao
       });
-      setProdutos(lista);
+      setProdutos(listaProdutos);
+      
+      const listaCategorias = await getCategorias();
+      setCategorias(listaCategorias);
     } catch (err) {
-      console.error('Erro ao carregar produtos:', err);
+      console.error('Erro ao carregar dados:', err);
     } finally {
       setCarregando(false);
     }
@@ -68,7 +71,7 @@ export default function App() {
 
   useEffect(() => {
     if (!modoAdmin) {
-      carregarProdutos();
+      carregarDados();
     }
   }, [categoriaAtiva, termoBuscaDebounced, ordenacao, modoAdmin]);
 
@@ -89,13 +92,11 @@ export default function App() {
   // Contagem de produtos por categoria
   const contagemPorCategoria = useMemo(() => {
     const counts = { todos: produtos.length };
-    CATEGORIAS.forEach(cat => {
-      if (cat.id !== 'todos') {
-        counts[cat.id] = produtos.filter(p => p.categoria === cat.id).length;
-      }
+    categorias.forEach(cat => {
+      counts[cat.id] = produtos.filter(p => p.categoria === cat.id).length;
     });
     return counts;
-  }, [produtos]);
+  }, [produtos, categorias]);
 
   // Paginação dos Itens Filtrados
   const totalPaginas = Math.ceil(produtos.length / itensPorPagina) || 1;
@@ -165,7 +166,7 @@ export default function App() {
       <AdminPanel 
         onVoltarCatalogo={() => {
           setModoAdmin(false);
-          carregarProdutos();
+          carregarDados();
         }} 
       />
     );
@@ -192,7 +193,7 @@ export default function App() {
               <h2>
                 {categoriaAtiva === 'todos' 
                   ? 'Catálogo Técnico Completo' 
-                  : CATEGORIAS.find(c => c.id === categoriaAtiva)?.label}
+                  : categorias.find(c => c.id === categoriaAtiva)?.label || 'Categoria'}
               </h2>
               <span className={styles.catalogCountInfo}>
                 {carregando ? (
@@ -220,7 +221,8 @@ export default function App() {
                     setPaginaAtual(1);
                   }}
                 >
-                  {CATEGORIAS.map((cat) => {
+                  <option value="todos">Todas as Categorias</option>
+                  {categorias.map((cat) => {
                     const count = contagemPorCategoria[cat.id] || 0;
                     return (
                       <option key={cat.id} value={cat.id}>

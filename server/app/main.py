@@ -5,7 +5,9 @@ import logging
 
 from .database import engine, Base, SessionLocal
 from .models.product import Product
+from .models.category import Category
 from .routers import products_router, stats_router, auth_router
+from .routers.categories import router as categories_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("wd-blocos-api")
@@ -18,10 +20,25 @@ async def lifespan(app: FastAPI):
 
     db = SessionLocal()
     try:
+        # Seed inicial de categorias caso vazio
+        cat_count = db.query(Category).count()
+        if cat_count == 0:
+            logger.info("🌱 Populando categorias iniciais...")
+            categorias_iniciais = [
+                Category(id="bloco-estrutural", label="Bloco Estrutural"),
+                Category(id="bloco-vedacao", label="Bloco de Vedação"),
+                Category(id="canaleta", label="Canaletas"),
+                Category(id="piso-intertravado", label="Pisos Intertravados"),
+                Category(id="piso-tatil", label="Piso Tátil")
+            ]
+            db.add_all(categorias_iniciais)
+            db.commit()
+
         count = db.query(Product).count()
         logger.info(f"✅ Banco pronto. {count} produto(s) cadastrado(s).")
     except Exception as e:
         logger.error(f"❌ Erro ao verificar banco: {e}")
+        db.rollback()
     finally:
         db.close()
 
@@ -50,6 +67,7 @@ app.add_middleware(
 app.include_router(products_router)
 app.include_router(stats_router)
 app.include_router(auth_router)
+app.include_router(categories_router)
 
 @app.get("/", tags=["Health"])
 def root():

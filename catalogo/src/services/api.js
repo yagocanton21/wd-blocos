@@ -116,3 +116,47 @@ export async function loginAdmin(username, password) {
   if (!res.ok) throw new Error(data.detail || 'Falha no login');
   return data;
 }
+
+// ==========================================
+// CATEGORIAS
+// ==========================================
+import { CATEGORIAS as CATEGORIAS_FALLBACK } from '../data/produtos';
+
+export async function getCategorias() {
+  try {
+    const res = await fetch(`${API_BASE}/categories`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('⚠️ Falha ao buscar categorias. Usando locais.', err);
+    return CATEGORIAS_FALLBACK.filter(c => c.id !== 'todos');
+  }
+}
+
+export async function criarCategoria(dados) {
+  const res = await fetch(`${API_BASE}/categories`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dados)
+  });
+  if (!res.ok) throw new Error('Erro ao cadastrar categoria');
+  return await res.json();
+}
+
+export async function atualizarCategoria(id, dados) {
+  const res = await fetch(`${API_BASE}/categories/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dados)
+  });
+  if (!res.ok) throw new Error('Erro ao atualizar categoria');
+  return await res.json();
+}
+
+export async function excluirCategoria(id) {
+  const res = await fetch(`${API_BASE}/categories/${id}`, {
+    method: 'DELETE'
+  });
+  if (!res.ok) throw new Error('Erro ao excluir categoria');
+  // 204 No Content não tem json no corpo
+}

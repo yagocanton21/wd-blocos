@@ -22,9 +22,12 @@ import {
   atualizarProduto, 
   alternarProntaEntrega, 
   excluirProduto, 
-  loginAdmin 
+  loginAdmin,
+  getCategorias,
+  criarCategoria,
+  atualizarCategoria,
+  excluirCategoria
 } from '../services/api';
-import { CATEGORIAS } from '../data/produtos';
 import styles from './AdminPanel.module.css';
 
 const PRODUTO_VAZIO = {
@@ -60,7 +63,9 @@ export default function AdminPanel({ onVoltarCatalogo }) {
   const [erroLogin, setErroLogin] = useState('');
 
   // Dados do Dashboard
+  const [abaAtiva, setAbaAtiva] = useState('produtos'); // 'produtos' ou 'categorias'
   const [produtos, setProdutos] = useState([]);
+  const [categorias, setCategorias] = useState([]);
   const [stats, setStats] = useState({ totalProdutos: 0, prontaEntrega: 0, sobEncomenda: 0 });
   const [termoBusca, setTermoBusca] = useState('');
   const [categoriaFiltro, setCategoriaFiltro] = useState('todos');
@@ -75,11 +80,15 @@ export default function AdminPanel({ onVoltarCatalogo }) {
   const [formDados, setFormDados] = useState(PRODUTO_VAZIO);
   const [salvando, setSalvando] = useState(false);
 
-  // Carrega produtos do PostgreSQL
+  // Carrega dados do PostgreSQL
   const carregarDados = async () => {
     try {
       const lista = await getProdutos({ busca: termoBusca, categoria: categoriaFiltro });
       setProdutos(lista);
+      
+      const listaCat = await getCategorias();
+      setCategorias(listaCat);
+
       const metricas = await getStats();
       setStats(metricas);
     } catch (e) {
@@ -183,6 +192,57 @@ export default function AdminPanel({ onVoltarCatalogo }) {
       await carregarDados();
     } catch (err) {
       alert('Erro ao salvar produto no banco de dados.');
+    } finally {
+      setSalvando(false);
+    }
+  };
+
+  // Estado do Modal de Categoria
+  const [modalCategoriaAberto, setModalCategoriaAberto] = useState(false);
+  const [categoriaEditando, setCategoriaEditando] = useState(null);
+  const [formCategoria, setFormCategoria] = useState({ id: '', label: '' });
+
+  const handleNovaCategoria = () => {
+    setCategoriaEditando(null);
+    setFormCategoria({ id: '', label: '' });
+    setModalCategoriaAberto(true);
+  };
+
+  const handleEditarCategoria = (cat) => {
+    setCategoriaEditando(cat);
+    setFormCategoria({ ...cat });
+    setModalCategoriaAberto(true);
+  };
+
+  const handleExcluirCategoria = async (id, label) => {
+    if (window.confirm(`Atenção: Deseja realmente excluir a categoria "${label}"? Certifique-se de que nenhum produto a esteja usando.`)) {
+      try {
+        await excluirCategoria(id);
+        await carregarDados();
+      } catch (err) {
+        alert('Erro ao excluir categoria.');
+      }
+    }
+  };
+
+  const handleSalvarCategoria = async (e) => {
+    e.preventDefault();
+    setSalvando(true);
+    try {
+      if (categoriaEditando) {
+        await atualizarCategoria(categoriaEditando.id, formCategoria);
+      } else {
+        // Gera um slug simples se não tiver id, ou usa o digitado
+        const catData = {
+          ...formCategoria,
+          id: formCategoria.id || formCategoria.label.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+        };
+        await criarCategoria(catData);
+      }
+      setModalCategoriaAberto(false);
+      await carregarDados();
+    } catch (err) {
+      alert('Erro ao salvar categoria no banco de dados.');
     } finally {
       setSalvando(false);
     }
@@ -294,14 +354,34 @@ export default function AdminPanel({ onVoltarCatalogo }) {
               <Layers size={24} />
             </div>
             <div>
-              <div className={styles.statValue}>{CATEGORIAS.length - 1}</div>
+              <div className={styles.statValue}>{categorias.length}</div>
               <div className={styles.statLabel}>Linhas / Categorias</div>
             </div>
           </div>
         </section>
 
-        {/* Barra de Filtros e Novo Produto */}
-        <div className={styles.tableControlsBar}>
+        {/* Abas */}
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+          <button 
+            type="button" 
+            className={abaAtiva === 'produtos' ? styles.btnSave : styles.btnCancel}
+            onClick={() => setAbaAtiva('produtos')}
+          >
+            Gerenciar Produtos
+          </button>
+          <button 
+            type="button" 
+            className={abaAtiva === 'categorias' ? styles.btnSave : styles.btnCancel}
+            onClick={() => setAbaAtiva('categorias')}
+          >
+            Gerenciar Categorias
+          </button>
+        </div>
+
+        {abaAtiva === 'produtos' && (
+          <>
+            {/* Barra de Filtros e Novo Produto */}
+            <div className={styles.tableControlsBar}>
           <div className={styles.tableFilters}>
             <div className={styles.searchBox}>
               <Search size={16} className={styles.searchIcon} />
@@ -319,7 +399,8 @@ export default function AdminPanel({ onVoltarCatalogo }) {
               value={categoriaFiltro}
               onChange={(e) => setCategoriaFiltro(e.target.value)}
             >
-              {CATEGORIAS.map(c => (
+              <option value="todos">Todas as Categorias</option>
+              {categorias.map(c => (
                 <option key={c.id} value={c.id}>{c.label}</option>
               ))}
             </select>
@@ -457,6 +538,73 @@ export default function AdminPanel({ onVoltarCatalogo }) {
             </div>
           )}
         </div>
+        </>
+        )}
+
+        {abaAtiva === 'categorias' && (
+          <>
+            <div className={styles.tableControlsBar}>
+              <div className={styles.tableFilters}>
+                <h3 style={{ margin: 0, color: '#1E293B' }}>Categorias do Catálogo</h3>
+              </div>
+              <button 
+                type="button" 
+                className={styles.btnNewProduct}
+                onClick={handleNovaCategoria}
+              >
+                <Plus size={18} /> Nova Categoria
+              </button>
+            </div>
+
+            <div className={styles.tableCard}>
+              <div className={styles.tableResponsive}>
+                <table className={styles.productTable}>
+                  <thead>
+                    <tr>
+                      <th className={styles.colCodigo} style={{ width: '30%' }}>ID (Slug)</th>
+                      <th className={styles.colMaterial}>Nome da Categoria</th>
+                      <th className={styles.colAcoes}>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {categorias.length === 0 ? (
+                      <tr>
+                        <td colSpan={3} style={{ textAlign: 'center', padding: '40px' }}>
+                          Nenhuma categoria cadastrada.
+                        </td>
+                      </tr>
+                    ) : (
+                      categorias.map((cat) => (
+                        <tr key={cat.id}>
+                          <td><span className={styles.codeBadge}>{cat.id}</span></td>
+                          <td><span className={styles.productNameText}>{cat.label}</span></td>
+                          <td>
+                            <div className={styles.actionsCell}>
+                              <button 
+                                type="button" 
+                                className={styles.btnAction}
+                                onClick={() => handleEditarCategoria(cat)}
+                              >
+                                <Edit3 size={14} /> Editar
+                              </button>
+                              <button 
+                                type="button" 
+                                className={`${styles.btnAction} ${styles.delete}`}
+                                onClick={() => handleExcluirCategoria(cat.id, cat.label)}
+                              >
+                                <Trash2 size={14} /> Excluir
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </>
+        )}
       </main>
 
       {/* Modal de Cadastro / Edição */}
@@ -510,7 +658,7 @@ export default function AdminPanel({ onVoltarCatalogo }) {
                     className={styles.formSelect}
                     value={formDados.categoria}
                     onChange={(e) => {
-                      const cat = CATEGORIAS.find(c => c.id === e.target.value);
+                      const cat = categorias.find(c => c.id === e.target.value);
                       setFormDados({ 
                         ...formDados, 
                         categoria: e.target.value,
@@ -518,7 +666,7 @@ export default function AdminPanel({ onVoltarCatalogo }) {
                       });
                     }}
                   >
-                    {CATEGORIAS.filter(c => c.id !== 'todos').map(c => (
+                    {categorias.map(c => (
                       <option key={c.id} value={c.id}>{c.label}</option>
                     ))}
                   </select>
@@ -641,6 +789,76 @@ export default function AdminPanel({ onVoltarCatalogo }) {
                   disabled={salvando}
                 >
                   {salvando ? 'Salvando...' : 'Salvar Produto'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Categoria */}
+      {modalCategoriaAberto && (
+        <div className={styles.modalBackdrop}>
+          <div className={styles.formModal} style={{ maxWidth: '500px' }}>
+            <div className={styles.modalHeader}>
+              <h3 className={styles.modalTitle}>
+                {categoriaEditando ? `Editar Categoria: ${categoriaEditando.label}` : 'Nova Categoria'}
+              </h3>
+              <button 
+                type="button" 
+                className={styles.modalCloseBtn}
+                onClick={() => setModalCategoriaAberto(false)}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSalvarCategoria} className={styles.modalForm}>
+              <div className={styles.formGrid}>
+                <div className={`${styles.formGroup} ${styles.formGridFull}`}>
+                  <label className={styles.formLabel}>Nome da Categoria *</label>
+                  <input 
+                    type="text" 
+                    className={styles.formInput} 
+                    value={formCategoria.label}
+                    placeholder="Ex: Blocos Estruturais"
+                    onChange={(e) => setFormCategoria({ ...formCategoria, label: e.target.value })}
+                    required 
+                  />
+                </div>
+                
+                <div className={`${styles.formGroup} ${styles.formGridFull}`}>
+                  <label className={styles.formLabel}>
+                    ID / Slug {categoriaEditando ? '(Não editável)' : '(Opcional - gerado automaticamente)'}
+                  </label>
+                  <input 
+                    type="text" 
+                    className={styles.formInput} 
+                    value={formCategoria.id}
+                    placeholder="Ex: blocos-estruturais"
+                    disabled={!!categoriaEditando}
+                    onChange={(e) => setFormCategoria({ ...formCategoria, id: e.target.value })}
+                  />
+                  <small style={{ color: '#64748B', display: 'block', marginTop: '4px' }}>
+                    O ID não pode conter espaços ou caracteres especiais.
+                  </small>
+                </div>
+              </div>
+
+              <div className={styles.modalFooter} style={{ marginTop: '20px' }}>
+                <button 
+                  type="button" 
+                  className={styles.btnCancel}
+                  onClick={() => setModalCategoriaAberto(false)}
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit" 
+                  className={styles.btnSave}
+                  disabled={salvando}
+                >
+                  {salvando ? 'Salvando...' : 'Salvar Categoria'}
                 </button>
               </div>
             </form>
