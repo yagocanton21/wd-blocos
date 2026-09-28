@@ -45,6 +45,8 @@ services:
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-wdblocos2026}
     ports:
       - "8001:8001"
+    volumes:
+      - wd_uploads_data:/app/uploads
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8001/')\""]
       interval: 15s
@@ -70,3 +72,5 @@ services:
 volumes:
   wd_postgres_data:
     name: wd_postgres_data
+  wd_uploads_data:
+    name: wd_uploads_data

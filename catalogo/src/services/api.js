@@ -4,6 +4,14 @@ import { PRODUTOS_INICIAIS } from '../data/produtos';
 // Em dev local: aponta direto para localhost:8001
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
+const formatImageUrl = (url) => {
+  if (!url) return null;
+  if (url.startsWith('/uploads') && API_BASE.startsWith('http')) {
+    return `${API_BASE.replace(/\/api\/?$/, '')}${url}`;
+  }
+  return url;
+};
+
 // Normaliza campos para suportar tanto camelCase quanto snake_case do backend
 const normalizarProduto = (p) => ({
   id: p.id,
@@ -12,7 +20,8 @@ const normalizarProduto = (p) => ({
   categoria: p.categoria,
   categoriaLabel: p.categoriaLabel || p.categoria_label || 'Material',
   destaque: Boolean(p.destaque),
-  foto: p.foto || p.foto_url || null,
+  foto: formatImageUrl(p.foto || p.foto_url || p.imagemUrl || p.imagem_url),
+  imagemUrl: formatImageUrl(p.imagemUrl || p.imagem_url),
   dimensoes: p.dimensoes || '',
   resistencia: p.resistencia || '',
   peso: p.peso || '',
@@ -73,6 +82,19 @@ export async function criarProduto(dados) {
   if (!res.ok) throw new Error('Erro ao cadastrar produto');
   const criado = await res.json();
   return normalizarProduto(criado);
+}
+
+// Upload de Imagem
+export async function uploadImage(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const res = await fetch(`${API_BASE}/upload`, {
+    method: 'POST',
+    body: formData
+  });
+  if (!res.ok) throw new Error('Erro ao fazer upload da imagem');
+  return await res.json();
 }
 
 // Atualizar produto existente

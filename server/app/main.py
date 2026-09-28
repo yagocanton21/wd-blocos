@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
@@ -8,6 +9,8 @@ from .models.product import Product
 from .models.category import Category
 from .routers import products_router, stats_router, auth_router
 from .routers.categories import router as categories_router
+from .routers.upload import router as upload_router
+import os
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("wd-blocos-api")
@@ -68,6 +71,12 @@ app.include_router(products_router)
 app.include_router(stats_router)
 app.include_router(auth_router)
 app.include_router(categories_router)
+app.include_router(upload_router)
+
+# Servir arquivos de upload estaticamente
+UPLOAD_DIR = "/app/uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 @app.get("/", tags=["Health"])
 def root():

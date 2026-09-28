@@ -26,7 +26,8 @@ import {
   getCategorias,
   criarCategoria,
   atualizarCategoria,
-  excluirCategoria
+  excluirCategoria,
+  uploadImage
 } from '../services/api';
 import styles from './AdminPanel.module.css';
 
@@ -79,6 +80,7 @@ export default function AdminPanel({ onVoltarCatalogo }) {
   const [produtoEditando, setProdutoEditando] = useState(null);
   const [formDados, setFormDados] = useState(PRODUTO_VAZIO);
   const [salvando, setSalvando] = useState(false);
+  const [fazendoUpload, setFazendoUpload] = useState(false);
 
   // Carrega dados do PostgreSQL
   const carregarDados = async () => {
@@ -143,6 +145,7 @@ export default function AdminPanel({ onVoltarCatalogo }) {
   const handleNovoProduto = () => {
     setProdutoEditando(null);
     setFormDados(PRODUTO_VAZIO);
+    setFazendoUpload(false);
     setModalAberto(true);
   };
 
@@ -153,7 +156,37 @@ export default function AdminPanel({ onVoltarCatalogo }) {
       ...p,
       aplicacoes: Array.isArray(p.aplicacoes) ? p.aplicacoes : []
     });
+    setFazendoUpload(false);
     setModalAberto(true);
+  };
+
+  // Fazer Upload de Imagem
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validação básica do tamanho e tipo
+    if (!file.type.startsWith('image/')) {
+      alert('Selecione apenas arquivos de imagem.');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      alert('A imagem é muito grande. O limite é de 5MB para não sobrecarregar o servidor.');
+      return;
+    }
+
+    setFazendoUpload(true);
+    try {
+      const res = await uploadImage(file);
+      // Se houver uma URL na resposta (res.url), salvamos no form
+      if (res.url) {
+        setFormDados(prev => ({ ...prev, imagemUrl: res.url }));
+      }
+    } catch (err) {
+      alert('Falha ao fazer o upload da imagem.');
+    } finally {
+      setFazendoUpload(false);
+    }
   };
 
   // Alternar Disponibilidade (1 clique)
@@ -717,6 +750,38 @@ export default function AdminPanel({ onVoltarCatalogo }) {
                     <option value="bisnaga">Argamassa Polimérica</option>
                     <option value="tela-aco">Tela Soldada de Aço</option>
                   </select>
+                </div>
+
+                {/* Foto Real do Produto */}
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Foto Real do Produto (Máx 5MB)</label>
+                  
+                  {formDados.imagemUrl ? (
+                    <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <img 
+                        src={formDados.imagemUrl.startsWith('http') ? formDados.imagemUrl : formDados.imagemUrl} 
+                        alt="Preview" 
+                        style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #E2E8F0' }}
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                      />
+                      <button 
+                        type="button" 
+                        style={{ background: 'none', border: 'none', color: '#EF4444', fontSize: '0.85rem', cursor: 'pointer', textDecoration: 'underline' }}
+                        onClick={() => setFormDados(prev => ({ ...prev, imagemUrl: null }))}
+                      >
+                        Remover Foto
+                      </button>
+                    </div>
+                  ) : null}
+
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    disabled={fazendoUpload}
+                    style={{ fontSize: '0.85rem', padding: '6px' }}
+                  />
+                  {fazendoUpload && <span style={{ fontSize: '0.8rem', color: '#F97316', marginLeft: '8px' }}>Enviando...</span>}
                 </div>
 
                 {/* Unidade */}
