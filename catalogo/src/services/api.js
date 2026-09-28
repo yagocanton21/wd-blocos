@@ -187,8 +187,14 @@ export async function excluirCategoria(id) {
   const res = await fetch(`${API_BASE}/categories/${id}`, {
     method: 'DELETE'
   });
-  if (!res.ok) throw new Error('Erro ao excluir categoria');
-  // 204 No Content não tem json no corpo
+  if (!res.ok) {
+    let msg = 'Erro ao excluir categoria';
+    try {
+      const errData = await res.json();
+      if (errData.detail) msg = errData.detail;
+    } catch (e) {}
+    throw new Error(msg);
+  }
 }
 
 // ==========================================

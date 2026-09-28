@@ -276,12 +276,12 @@ export default function AdminPanel({ onVoltarCatalogo }) {
   };
 
   const handleExcluirCategoria = async (id, label) => {
-    if (window.confirm(`Atenção: Deseja realmente excluir a categoria "${label}"? Certifique-se de que nenhum produto a esteja usando.`)) {
+    if (window.confirm(`Atenção: Deseja realmente excluir a categoria "${label}"?`)) {
       try {
         await excluirCategoria(id);
         await carregarDados();
       } catch (err) {
-        alert('Erro ao excluir categoria.');
+        alert(err.message || 'Erro ao excluir categoria.');
       }
     }
   };
@@ -877,7 +877,7 @@ export default function AdminPanel({ onVoltarCatalogo }) {
                     className={styles.formInput} 
                     value={formDados.qtdMinima || 10}
                     min={1}
-                    onChange={(e) => setFormDados({ ...formDados, qtdMinima: parseInt(e.target.value) || 1 })}
+                    onChange={(e) => setFormDados({ ...formDados, qtdMinima: Math.max(1, parseInt(e.target.value) || 1) })}
                   />
                 </div>
 

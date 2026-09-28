@@ -44,6 +44,15 @@ def delete_category(category_id: str, db: Session = Depends(get_db)):
     if not db_cat:
         raise HTTPException(status_code=404, detail="Categoria não encontrada")
     
+    # Validação para usuário leigo: impedir exclusão se houver produtos
+    from ..models.product import Product
+    produtos_vinculados = db.query(Product).filter(Product.categoria == category_id).count()
+    if produtos_vinculados > 0:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Não é possível excluir: existem {produtos_vinculados} produtos nesta categoria."
+        )
+    
     db.delete(db_cat)
     db.commit()
     return None
