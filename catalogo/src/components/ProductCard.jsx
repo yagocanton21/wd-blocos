@@ -35,8 +35,8 @@ export default function ProductCard({
 
   // Linha de especificações essenciais resumida
   const specText = [
-    produto.dimensoes,
-    produto.resistencia && produto.resistencia !== 'Livre de impurezas' ? produto.resistencia : null
+    produto.categoriaLabel,
+    `Mín: ${produto.qtdMinima} ${produto.unidade || 'un'}`
   ].filter(Boolean).join(' • ');
 
   return (
