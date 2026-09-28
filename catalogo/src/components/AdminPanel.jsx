@@ -75,6 +75,7 @@ export default function AdminPanel({ onVoltarCatalogo }) {
 
   // Paginação da Tabela Admin
   const [paginaTabela, setPaginaTabela] = useState(1);
+  const [paginaCategorias, setPaginaCategorias] = useState(1);
   const [itensPorPaginaTabela, setItensPorPaginaTabela] = useState(8);
 
   // Estado do Modal de Criação / Edição
@@ -115,6 +116,11 @@ export default function AdminPanel({ onVoltarCatalogo }) {
   const totalPaginas = Math.max(1, Math.ceil(produtos.length / itensPorPaginaTabela));
   const indiceInicio = (paginaTabela - 1) * itensPorPaginaTabela;
   const produtosExibidos = produtos.slice(indiceInicio, indiceInicio + itensPorPaginaTabela);
+
+  // Cálculos de paginação de categorias
+  const totalPaginasCategorias = Math.max(1, Math.ceil(categorias.length / itensPorPaginaTabela));
+  const indiceInicioCategorias = (paginaCategorias - 1) * itensPorPaginaTabela;
+  const categoriasExibidas = categorias.slice(indiceInicioCategorias, indiceInicioCategorias + itensPorPaginaTabela);
 
   // Login
   const handleLogin = async (e) => {
@@ -628,7 +634,7 @@ export default function AdminPanel({ onVoltarCatalogo }) {
                         </td>
                       </tr>
                     ) : (
-                      categorias.map((cat) => (
+                      categoriasExibidas.map((cat) => (
                         <tr key={cat.id}>
                           <td><span className={styles.codeBadge}>{cat.id}</span></td>
                           <td><span className={styles.productNameText}>{cat.label}</span></td>
@@ -656,6 +662,49 @@ export default function AdminPanel({ onVoltarCatalogo }) {
                   </tbody>
                 </table>
               </div>
+
+              {/* Paginação de Categorias */}
+              {categorias.length > 0 && (
+                <div className={styles.tablePagination}>
+                  <div className={styles.paginationText}>
+                    Mostrando <strong>{indiceInicioCategorias + 1}</strong> a <strong>{Math.min(indiceInicioCategorias + itensPorPaginaTabela, categorias.length)}</strong> de <strong>{categorias.length}</strong> categorias
+                  </div>
+
+                  <div className={styles.paginationControls}>
+                    <button
+                      type="button"
+                      className={styles.pageBtn}
+                      onClick={() => setPaginaCategorias((p) => Math.max(1, p - 1))}
+                      disabled={paginaCategorias === 1}
+                      title="Página Anterior"
+                    >
+                      <ChevronLeft size={16} />
+                    </button>
+
+                    {Array.from({ length: totalPaginasCategorias }, (_, i) => i + 1).map((num) => (
+                      <button
+                        key={num}
+                        type="button"
+                        className={`${styles.pageBtn} ${paginaCategorias === num ? styles.active : ''}`}
+                        onClick={() => setPaginaCategorias(num)}
+                      >
+                        {num}
+                      </button>
+                    ))}
+
+                    <button
+                      type="button"
+                      className={styles.pageBtn}
+                      onClick={() => setPaginaCategorias((p) => Math.min(totalPaginasCategorias, p + 1))}
+                      disabled={paginaCategorias === totalPaginasCategorias}
+                      title="Próxima Página"
+                    >
+                      <ChevronRight size={16} />
+                    </button>
+                  </div>
+                </div>
+              )}
+
             </div>
           </>
         )}
