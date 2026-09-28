@@ -46,7 +46,7 @@ export async function getProdutos(filtros = {}) {
     if (filtros.busca) params.append('busca', filtros.busca);
     if (filtros.ordenacao) params.append('ordenacao', filtros.ordenacao);
 
-    const res = await fetch(`${API_BASE}/produtos?${params.toString()}`);
+    const res = await fetch(`${API_BASE}/produtos?${params.toString()}`, { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     return Array.isArray(data) ? data.map(normalizarProduto) : [];
@@ -59,7 +59,7 @@ export async function getProdutos(filtros = {}) {
 // Estatísticas do painel
 export async function getStats() {
   try {
-    const res = await fetch(`${API_BASE}/stats`);
+    const res = await fetch(`${API_BASE}/stats`, { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch {
@@ -144,7 +144,7 @@ export async function loginAdmin(username, password) {
 // ==========================================
 export async function getCategorias() {
   try {
-    const res = await fetch(`${API_BASE}/categories`);
+    const res = await fetch(`${API_BASE}/categories`, { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
