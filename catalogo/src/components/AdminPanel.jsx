@@ -738,7 +738,6 @@ export default function AdminPanel({ onVoltarCatalogo }) {
               )}
 
             </div>
-            </div>
           </>
         )}
 
