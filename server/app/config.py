@@ -1,4 +1,5 @@
 import os
+import urllib.parse
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -9,9 +10,11 @@ DB_NAME = os.getenv("DB_NAME", "wd_blocos")
 DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "wd_blocos_secret")
 
+encoded_password = urllib.parse.quote_plus(DB_PASSWORD)
+
 DATABASE_URL = os.getenv(
     "DATABASE_URL", 
-    f"postgresql+psycopg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    f"postgresql+psycopg://{DB_USER}:{encoded_password}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 )
 
 ADMIN_USER = os.getenv("ADMIN_USER", "admin")
