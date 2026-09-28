@@ -79,7 +79,8 @@ def create_product(product_in: ProductCreate, db: Session = Depends(get_db)):
         descricao_curta=product_in.descricaoCurta,
         descricao_longa=product_in.descricaoLonga,
         aplicacoes=product_in.aplicacoes or [],
-        tipo_icone=product_in.tipoIcone
+        tipo_icone=product_in.tipoIcone,
+        imagem_url=product_in.imagemUrl
     )
 
     db.add(product)
@@ -109,7 +110,8 @@ def update_product(
         "prontaEntrega": "pronta_entrega",
         "descricaoCurta": "descricao_curta",
         "descricaoLonga": "descricao_longa",
-        "tipoIcone": "tipo_icone"
+        "tipoIcone": "tipo_icone",
+        "imagemUrl": "imagem_url"
     }
 
     for key, value in update_data.items():

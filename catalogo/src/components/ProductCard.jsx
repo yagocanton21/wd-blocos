@@ -43,10 +43,10 @@ export default function ProductCard({
     <div className={styles.productCard}>
       {/* Visual: Foto real OU SVG ilustrativo */}
       <div className={styles.visualContainer}>
-        {produto.foto ? (
+        {produto.imagemUrl ? (
           <div className={styles.photoWrapper}>
             <img
-              src={produto.foto}
+              src={produto.imagemUrl}
               alt={produto.nome}
               className={styles.productPhoto}
               loading="lazy"
@@ -58,7 +58,7 @@ export default function ProductCard({
             />
           </div>
         ) : null}
-        <div className={styles.svgFallback} style={produto.foto ? { display: 'none' } : {}}>
+        <div className={styles.svgFallback} style={produto.imagemUrl ? { display: 'none' } : {}}>
           <ProductVisual 
             tipo={produto.tipoIcone} 
             dimensao="" 
