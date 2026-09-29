@@ -5,6 +5,7 @@ from typing import List
 from ..database import get_db
 from ..models.category import Category
 from ..schemas.category import CategoryCreate, CategoryUpdate, CategoryResponse
+from ..dependencies import get_current_admin
 
 router = APIRouter(
     prefix="/api/categories",
@@ -16,7 +17,7 @@ def get_categories(db: Session = Depends(get_db)):
     return db.query(Category).order_by(Category.label).all()
 
 @router.post("/", response_model=CategoryResponse, status_code=status.HTTP_201_CREATED)
-def create_category(category: CategoryCreate, db: Session = Depends(get_db)):
+def create_category(category: CategoryCreate, db: Session = Depends(get_db), admin_user: str = Depends(get_current_admin)):
     db_cat = db.query(Category).filter(Category.id == category.id).first()
     if db_cat:
         raise HTTPException(status_code=400, detail="Categoria com este ID já existe")
@@ -28,7 +29,7 @@ def create_category(category: CategoryCreate, db: Session = Depends(get_db)):
     return new_category
 
 @router.put("/{category_id}", response_model=CategoryResponse)
-def update_category(category_id: str, category: CategoryUpdate, db: Session = Depends(get_db)):
+def update_category(category_id: str, category: CategoryUpdate, db: Session = Depends(get_db), admin_user: str = Depends(get_current_admin)):
     db_cat = db.query(Category).filter(Category.id == category_id).first()
     if not db_cat:
         raise HTTPException(status_code=404, detail="Categoria não encontrada")
@@ -39,7 +40,7 @@ def update_category(category_id: str, category: CategoryUpdate, db: Session = De
     return db_cat
 
 @router.delete("/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_category(category_id: str, db: Session = Depends(get_db)):
+def delete_category(category_id: str, db: Session = Depends(get_db), admin_user: str = Depends(get_current_admin)):
     db_cat = db.query(Category).filter(Category.id == category_id).first()
     if not db_cat:
         raise HTTPException(status_code=404, detail="Categoria não encontrada")

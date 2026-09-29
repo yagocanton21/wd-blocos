@@ -12,6 +12,17 @@ const formatImageUrl = (url) => {
   return url;
 };
 
+const getAuthHeaders = (extraHeaders = {}) => {
+  return extraHeaders;
+};
+
+const getFetchOptions = (extraOptions = {}) => {
+  return {
+    credentials: 'include',
+    ...extraOptions
+  };
+};
+
 // Normaliza campos para suportar tanto camelCase quanto snake_case do backend
 const normalizarProduto = (p) => ({
   id: p.id,
@@ -61,7 +72,10 @@ export async function getProdutos(filtros = {}) {
 // Estatísticas do painel
 export async function getStats() {
   try {
-    const res = await fetch(`${API_BASE}/stats`, { cache: 'no-store' });
+    const res = await fetch(`${API_BASE}/stats`, getFetchOptions({ 
+      cache: 'no-store',
+      headers: getAuthHeaders()
+    }));
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch {
@@ -76,11 +90,11 @@ export async function getStats() {
 
 // Cadastrar novo produto
 export async function criarProduto(dados) {
-  const res = await fetch(`${API_BASE}/produtos`, {
+  const res = await fetch(`${API_BASE}/produtos`, getFetchOptions({
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(dados)
-  });
+  }));
   if (!res.ok) throw new Error('Erro ao cadastrar produto');
   const criado = await res.json();
   return normalizarProduto(criado);
@@ -91,21 +105,22 @@ export async function uploadImage(file) {
   const formData = new FormData();
   formData.append('file', file);
 
-  const res = await fetch(`${API_BASE}/upload`, {
+  const res = await fetch(`${API_BASE}/upload`, getFetchOptions({
     method: 'POST',
+    headers: getAuthHeaders(),
     body: formData
-  });
+  }));
   if (!res.ok) throw new Error('Erro ao fazer upload da imagem');
   return await res.json();
 }
 
 // Atualizar produto existente
 export async function atualizarProduto(id, dados) {
-  const res = await fetch(`${API_BASE}/produtos/${id}`, {
+  const res = await fetch(`${API_BASE}/produtos/${id}`, getFetchOptions({
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(dados)
-  });
+  }));
   if (!res.ok) throw new Error('Erro ao atualizar produto');
   const atualizado = await res.json();
   return normalizarProduto(atualizado);
@@ -113,40 +128,56 @@ export async function atualizarProduto(id, dados) {
 
 // Alternar status rápida (1 clique)
 export async function alternarProntaEntrega(id) {
-  const res = await fetch(`${API_BASE}/produtos/${id}/toggle-pronta-entrega`, {
-    method: 'PATCH'
-  });
+  const res = await fetch(`${API_BASE}/produtos/${id}/toggle-pronta-entrega`, getFetchOptions({
+    method: 'PATCH',
+    headers: getAuthHeaders()
+  }));
   if (!res.ok) throw new Error('Erro ao alternar disponibilidade');
   return await res.json();
 }
 
 export async function alternarAtivo(id) {
-  const res = await fetch(`${API_BASE}/produtos/${id}/toggle-ativo`, {
-    method: 'PATCH'
-  });
+  const res = await fetch(`${API_BASE}/produtos/${id}/toggle-ativo`, getFetchOptions({
+    method: 'PATCH',
+    headers: getAuthHeaders()
+  }));
   if (!res.ok) throw new Error('Erro ao alternar status ativo');
   return await res.json();
 }
 
 // Excluir produto
 export async function excluirProduto(id) {
-  const res = await fetch(`${API_BASE}/produtos/${id}`, {
-    method: 'DELETE'
-  });
+  const res = await fetch(`${API_BASE}/produtos/${id}`, getFetchOptions({
+    method: 'DELETE',
+    headers: getAuthHeaders()
+  }));
   if (!res.ok) throw new Error('Erro ao excluir produto');
   return await res.json();
 }
 
 // Autenticação de Administrador
 export async function loginAdmin(username, password) {
-  const res = await fetch(`${API_BASE}/auth/login`, {
+  const res = await fetch(`${API_BASE}/auth/login`, getFetchOptions({
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username, password })
-  });
+  }));
   const data = await res.json();
   if (!res.ok) throw new Error(data.detail || 'Falha no login');
   return data;
+}
+
+export async function logoutAdmin() {
+  const res = await fetch(`${API_BASE}/auth/logout`, getFetchOptions({
+    method: 'POST'
+  }));
+  return res.ok;
+}
+
+export async function checkAuth() {
+  const res = await fetch(`${API_BASE}/auth/verify`, getFetchOptions());
+  if (!res.ok) throw new Error('Não autenticado');
+  return await res.json();
 }
 
 // ==========================================
@@ -164,29 +195,30 @@ export async function getCategorias() {
 }
 
 export async function criarCategoria(dados) {
-  const res = await fetch(`${API_BASE}/categories`, {
+  const res = await fetch(`${API_BASE}/categories`, getFetchOptions({
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(dados)
-  });
+  }));
   if (!res.ok) throw new Error('Erro ao cadastrar categoria');
   return await res.json();
 }
 
 export async function atualizarCategoria(id, dados) {
-  const res = await fetch(`${API_BASE}/categories/${id}`, {
+  const res = await fetch(`${API_BASE}/categories/${id}`, getFetchOptions({
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(dados)
-  });
+  }));
   if (!res.ok) throw new Error('Erro ao atualizar categoria');
   return await res.json();
 }
 
 export async function excluirCategoria(id) {
-  const res = await fetch(`${API_BASE}/categories/${id}`, {
-    method: 'DELETE'
-  });
+  const res = await fetch(`${API_BASE}/categories/${id}`, getFetchOptions({
+    method: 'DELETE',
+    headers: getAuthHeaders()
+  }));
   if (!res.ok) {
     let msg = 'Erro ao excluir categoria';
     try {
@@ -214,11 +246,11 @@ export async function getConfig() {
 }
 
 export async function updateConfig(dados) {
-  const res = await fetch(`${API_BASE}/config`, {
+  const res = await fetch(`${API_BASE}/config`, getFetchOptions({
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(dados)
-  });
+  }));
   if (!res.ok) throw new Error('Erro ao salvar configurações');
   return await res.json();
 }

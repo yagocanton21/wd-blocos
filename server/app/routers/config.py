@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from ..models.config import StoreConfig
 from ..schemas.config import StoreConfigResponse, StoreConfigUpdate
+from ..dependencies import get_current_admin
 
 router = APIRouter(prefix="/api/config", tags=["Config"])
 
@@ -17,7 +18,7 @@ def get_config(db: Session = Depends(get_db)):
     return config
 
 @router.put("", response_model=StoreConfigResponse)
-def update_config(config_in: StoreConfigUpdate, db: Session = Depends(get_db)):
+def update_config(config_in: StoreConfigUpdate, db: Session = Depends(get_db), admin_user: str = Depends(get_current_admin)):
     config = db.query(StoreConfig).filter_by(id="default").first()
     if not config:
         config = StoreConfig(id="default")

@@ -1,7 +1,8 @@
 import os
 import shutil
 from uuid import uuid4
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
+from ..dependencies import get_current_admin
 
 router = APIRouter(prefix="/api/upload", tags=["Upload"])
 
@@ -10,7 +11,7 @@ UPLOAD_DIR = "/app/uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @router.post("")
-async def upload_image(file: UploadFile = File(...)):
+async def upload_image(file: UploadFile = File(...), admin_user: str = Depends(get_current_admin)):
     if not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="O arquivo não é uma imagem válida")
     

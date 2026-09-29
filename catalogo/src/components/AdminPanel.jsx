@@ -30,8 +30,9 @@ import {
   atualizarCategoria,
   excluirCategoria,
   uploadImage,
-  getConfig,
-  updateConfig
+  updateConfig,
+  logoutAdmin,
+  checkAuth
 } from '../services/api';
 import styles from './AdminPanel.module.css';
 
@@ -59,14 +60,14 @@ const PRODUTO_VAZIO = {
 };
 
 export default function AdminPanel({ onVoltarCatalogo }) {
-  const [autenticado, setAutenticado] = useState(() => {
-    return Boolean(localStorage.getItem('wd_admin_token'));
-  });
+  const [autenticado, setAutenticado] = useState(false);
+  const [verificandoAuth, setVerificandoAuth] = useState(true);
 
   // Credenciais de Login
   const [usuario, setUsuario] = useState('');
   const [senha, setSenha] = useState('');
   const [erroLogin, setErroLogin] = useState('');
+  const [manterConectado, setManterConectado] = useState(false);
 
   // Dados do Dashboard
   const [abaAtiva, setAbaAtiva] = useState('produtos'); // 'produtos' ou 'categorias'
@@ -114,10 +115,25 @@ export default function AdminPanel({ onVoltarCatalogo }) {
   };
 
   useEffect(() => {
+    const initAuth = async () => {
+      try {
+        await checkAuth();
+        setAutenticado(true);
+        carregarDados();
+      } catch (err) {
+        setAutenticado(false);
+      } finally {
+        setVerificandoAuth(false);
+      }
+    };
+    initAuth();
+  }, []);
+
+  useEffect(() => {
     if (autenticado) {
       carregarDados();
     }
-  }, [autenticado, termoBusca, categoriaFiltro]);
+  }, [termoBusca, categoriaFiltro]);
 
   // Reseta para a primeira página ao filtrar ou buscar
   useEffect(() => {
@@ -141,8 +157,8 @@ export default function AdminPanel({ onVoltarCatalogo }) {
     try {
       const res = await loginAdmin(usuario, senha);
       if (res.success) {
-        localStorage.setItem('wd_admin_token', res.token);
         setAutenticado(true);
+        carregarDados();
       }
     } catch (err) {
       const msg = err.message || '';
@@ -156,8 +172,10 @@ export default function AdminPanel({ onVoltarCatalogo }) {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('wd_admin_token');
+  const handleLogout = async () => {
+    try {
+      await logoutAdmin();
+    } catch (e) {}
     setAutenticado(false);
   };
 
@@ -329,6 +347,14 @@ export default function AdminPanel({ onVoltarCatalogo }) {
   };
 
   // SE NÃO AUTENTICADO: Tela de Login
+  if (verificandoAuth) {
+    return (
+      <div className={styles.adminWrapper} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p>Verificando autenticação...</p>
+      </div>
+    );
+  }
+
   if (!autenticado) {
     return (
       <div className={styles.adminWrapper}>

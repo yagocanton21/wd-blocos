@@ -5,11 +5,12 @@ from sqlalchemy import func
 from ..database import get_db
 from ..models.product import Product
 from ..schemas.auth import StatsResponse
+from ..dependencies import get_current_admin
 
 router = APIRouter(prefix="/api/stats", tags=["Estatísticas"])
 
 @router.get("", response_model=StatsResponse)
-def get_stats(db: Session = Depends(get_db)):
+def get_stats(db: Session = Depends(get_db), admin_user: str = Depends(get_current_admin)):
     total = db.query(Product).count()
     pronta_entrega = db.query(Product).filter(Product.pronta_entrega == True).count()
     sob_encomenda = db.query(Product).filter(Product.pronta_entrega == False).count()

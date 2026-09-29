@@ -8,6 +8,7 @@ import random
 from ..database import get_db
 from ..models.product import Product
 from ..schemas.product import ProductResponse, ProductCreate, ProductUpdate
+from ..dependencies import get_current_admin
 
 router = APIRouter(prefix="/api/produtos", tags=["Produtos"])
 
@@ -58,7 +59,7 @@ def get_product(product_id: str, db: Session = Depends(get_db)):
     return product
 
 @router.post("", response_model=ProductResponse, status_code=status.HTTP_201_CREATED)
-def create_product(product_in: ProductCreate, db: Session = Depends(get_db)):
+def create_product(product_in: ProductCreate, db: Session = Depends(get_db), admin_user: str = Depends(get_current_admin)):
     prod_id = product_in.id or f"prod-{int(time.time() * 1000)}"
     codigo = product_in.codigo or f"WD-{random.randint(1000, 9999)}"
 
@@ -96,7 +97,8 @@ def create_product(product_in: ProductCreate, db: Session = Depends(get_db)):
 def update_product(
     product_id: str, 
     product_in: ProductUpdate, 
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    admin_user: str = Depends(get_current_admin)
 ):
     product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
@@ -128,7 +130,7 @@ def update_product(
     return product
 
 @router.patch("/{product_id}/toggle-pronta-entrega")
-def toggle_availability(product_id: str, db: Session = Depends(get_db)):
+def toggle_availability(product_id: str, db: Session = Depends(get_db), admin_user: str = Depends(get_current_admin)):
     product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
         raise HTTPException(
@@ -142,7 +144,7 @@ def toggle_availability(product_id: str, db: Session = Depends(get_db)):
     return {"id": product.id, "prontaEntrega": product.pronta_entrega}
 
 @router.patch("/{product_id}/toggle-ativo")
-def toggle_product_ativo(product_id: str, db: Session = Depends(get_db)):
+def toggle_product_ativo(product_id: str, db: Session = Depends(get_db), admin_user: str = Depends(get_current_admin)):
     product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
         raise HTTPException(
@@ -156,7 +158,7 @@ def toggle_product_ativo(product_id: str, db: Session = Depends(get_db)):
     return {"id": product.id, "ativo": product.ativo}
 
 @router.delete("/{product_id}")
-def delete_product(product_id: str, db: Session = Depends(get_db)):
+def delete_product(product_id: str, db: Session = Depends(get_db), admin_user: str = Depends(get_current_admin)):
     product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
         raise HTTPException(
