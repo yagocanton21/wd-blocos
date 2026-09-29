@@ -11,6 +11,8 @@ Central de operação da WD Blocos para organizar marketing, conteúdos de redes
 - `_memoria/` — negócio, tom de voz e foco atual
 - `identidade/` — logo e referências visuais
 - `marketing/` — conteúdos e planejamento de redes sociais
+- `catalogo/` — frontend React + Vite (Catálogo Público e Painel Admin)
+- `server/` — backend FastAPI + PostgreSQL (API REST)
 - `saidas/` — orçamentos, documentos e materiais pontuais
 - `dados/` — arquivos para análise
 - `scripts/` — automações e ferramentas
@@ -22,7 +24,7 @@ A WD Blocos fornece materiais de construção para pessoas construindo a própri
 ## Foco atual
 
 - Fortalecer as redes sociais
-- Catálogo Digital / Vitrine Técnica de Produtos (~200 itens, sem fluxo de orçamento) — em negociação (faixa de R$ 1.000)
+- Catálogo Digital & Painel Admin (produção na VPS Oracle Cloud; próximos passos: domínio próprio, SSL e otimizações)
 - Gerador de orçamentos (pausado por enquanto)
 
 ## Tom de voz
@@ -42,5 +44,5 @@ Evitar legendas genéricas.
 
 - [x] Site institucional
 - [x] Instagram
-- [ ] Catálogo Digital (em negociação / infraestrutura pronta na VPS2)
+- [x] Catálogo Digital & Painel Admin (produção na VPS Oracle Cloud)
 - [ ] Gerador de orçamentos (pausado)

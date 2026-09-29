@@ -23,6 +23,15 @@ async def lifespan(app: FastAPI):
     logger.info("📦 Inicializando banco de dados PostgreSQL...")
     Base.metadata.create_all(bind=engine)
 
+    # Garante tipo TEXT para imagem_url em bases existentes caso tenham sido criadas com varchar(500)
+    try:
+        from sqlalchemy import text
+        with engine.connect() as conn:
+            conn.execute(text("ALTER TABLE produtos ALTER COLUMN imagem_url TYPE TEXT;"))
+            conn.commit()
+    except Exception as e:
+        logger.debug(f"Ajuste de coluna imagem_url ignorado: {e}")
+
     logger.info("✅ Banco pronto. Nenhuma semente inicial gerada por escolha do usuário.")
 
     yield

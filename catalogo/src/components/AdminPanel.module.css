@@ -714,6 +714,176 @@
   border-radius: var(--radius-sm);
 }
 
+/* Seletor de Modo de Foto (Upload vs URL) */
+.photoModeToggle {
+  display: flex;
+  background-color: #0B1120;
+  border: 1px solid #1E293B;
+  border-radius: 6px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.photoTabBtn {
+  background: none;
+  border: none;
+  color: #94A3B8;
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.photoTabBtn:hover {
+  color: #FFFFFF;
+}
+
+.photoTabBtnActive {
+  background-color: #1E293B;
+  color: #FF6600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.uploadBox,
+.urlBox {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fileInput {
+  background-color: #0B1120;
+  border: 1px dashed #334155;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  color: #E2E8F0;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.fileInput:hover {
+  border-color: #64748B;
+}
+
+.photoHelpText {
+  font-size: 0.72rem;
+  color: #64748B;
+}
+
+.uploadingBadge {
+  font-size: 0.78rem;
+  color: #F97316;
+  font-weight: 600;
+}
+
+/* Card de Pré-visualização da Imagem */
+.photoPreviewCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: #070D1B;
+  border: 1px solid #1E293B;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-top: 6px;
+}
+
+.previewImageContainer {
+  width: 52px;
+  height: 52px;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #0B1120;
+  border: 1px solid #334155;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.previewImageContainer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.previewDetails {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.previewStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.previewSuccess {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #10B981;
+}
+
+.previewError {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #EF4444;
+}
+
+.previewSourceBadge {
+  font-size: 0.68rem;
+  background-color: #1E293B;
+  color: #94A3B8;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.previewUrlText {
+  font-size: 0.72rem;
+  color: #64748B;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 320px;
+}
+
+.previewRemoveBtn {
+  background: none;
+  border: 1px solid #334155;
+  color: #EF4444;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.previewRemoveBtn:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: #EF4444;
+}
+
 @media (max-width: 900px) {
   .statsGrid {
     grid-template-columns: 1fr 1fr;

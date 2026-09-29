@@ -9,13 +9,12 @@ import {
   LogOut, 
   Layers, 
   X, 
-  Save, 
   Check, 
-  SlidersHorizontal,
-  ChevronLeft,
-  ChevronRight,
-  Settings,
-  Tag
+  ChevronLeft, 
+  ChevronRight, 
+  Upload, 
+  Link as LinkIcon, 
+  AlertCircle 
 } from 'lucide-react';
 import { 
   getProdutos, 
@@ -88,6 +87,8 @@ export default function AdminPanel({ onVoltarCatalogo }) {
   const [formDados, setFormDados] = useState(PRODUTO_VAZIO);
   const [salvando, setSalvando] = useState(false);
   const [fazendoUpload, setFazendoUpload] = useState(false);
+  const [modoFoto, setModoFoto] = useState('upload'); // 'upload' ou 'url'
+  const [erroCarregarUrl, setErroCarregarUrl] = useState(false);
 
   // Configurações da Loja
   const [configLoja, setConfigLoja] = useState({ telefone_whatsapp: '', telefone_exibicao: '' });
@@ -165,6 +166,8 @@ export default function AdminPanel({ onVoltarCatalogo }) {
     setProdutoEditando(null);
     setFormDados(PRODUTO_VAZIO);
     setFazendoUpload(false);
+    setModoFoto('upload');
+    setErroCarregarUrl(false);
     setModalAberto(true);
   };
 
@@ -176,6 +179,8 @@ export default function AdminPanel({ onVoltarCatalogo }) {
       aplicacoes: Array.isArray(p.aplicacoes) ? p.aplicacoes : []
     });
     setFazendoUpload(false);
+    setModoFoto(p.imagemUrl && (p.imagemUrl.startsWith('http://') || p.imagemUrl.startsWith('https://')) ? 'url' : 'upload');
+    setErroCarregarUrl(false);
     setModalAberto(true);
   };
 
@@ -837,38 +842,6 @@ export default function AdminPanel({ onVoltarCatalogo }) {
                   </select>
                 </div>
 
-                {/* Foto Real do Produto */}
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>Foto Real do Produto (Máx 5MB)</label>
-                  
-                  {formDados.imagemUrl ? (
-                    <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <img 
-                        src={formDados.imagemUrl.startsWith('http') ? formDados.imagemUrl : formDados.imagemUrl} 
-                        alt="Preview" 
-                        style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #E2E8F0' }}
-                        onError={(e) => { e.target.style.display = 'none'; }}
-                      />
-                      <button 
-                        type="button" 
-                        style={{ background: 'none', border: 'none', color: '#EF4444', fontSize: '0.85rem', cursor: 'pointer', textDecoration: 'underline' }}
-                        onClick={() => setFormDados(prev => ({ ...prev, imagemUrl: null }))}
-                      >
-                        Remover Foto
-                      </button>
-                    </div>
-                  ) : null}
-
-                  <input 
-                    type="file" 
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    disabled={fazendoUpload}
-                    style={{ fontSize: '0.85rem', padding: '6px' }}
-                  />
-                  {fazendoUpload && <span style={{ fontSize: '0.8rem', color: '#F97316', marginLeft: '8px' }}>Enviando...</span>}
-                </div>
-
                 {/* Quantidade Mínima */}
                 <div className={styles.formGroup}>
                   <label className={styles.formLabel}>Qtd. Mínima para Cotação</label>
@@ -879,6 +852,106 @@ export default function AdminPanel({ onVoltarCatalogo }) {
                     min={1}
                     onChange={(e) => setFormDados({ ...formDados, qtdMinima: Math.max(1, parseInt(e.target.value) || 1) })}
                   />
+                </div>
+
+                {/* Foto Real do Produto (Arquivo Local ou URL da Internet) */}
+                <div className={`${styles.formGroup} ${styles.formGridFull}`}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px', flexWrap: 'wrap', gap: '8px' }}>
+                    <label className={styles.formLabel}>Foto do Produto (Opcional)</label>
+                    <div className={styles.photoModeToggle}>
+                      <button
+                        type="button"
+                        className={`${styles.photoTabBtn} ${modoFoto === 'upload' ? styles.photoTabBtnActive : ''}`}
+                        onClick={() => setModoFoto('upload')}
+                      >
+                        <Upload size={13} /> Enviar Arquivo
+                      </button>
+                      <button
+                        type="button"
+                        className={`${styles.photoTabBtn} ${modoFoto === 'url' ? styles.photoTabBtnActive : ''}`}
+                        onClick={() => setModoFoto('url')}
+                      >
+                        <LinkIcon size={13} /> Link da Internet (URL)
+                      </button>
+                    </div>
+                  </div>
+
+                  {modoFoto === 'upload' ? (
+                    <div className={styles.uploadBox}>
+                      <input 
+                        type="file" 
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        disabled={fazendoUpload}
+                        className={styles.fileInput}
+                      />
+                      <span className={styles.photoHelpText}>
+                        Selecione um arquivo de foto do seu computador ou celular (Máx 5MB).
+                      </span>
+                      {fazendoUpload && <span className={styles.uploadingBadge}>Enviando imagem para o servidor...</span>}
+                    </div>
+                  ) : (
+                    <div className={styles.urlBox}>
+                      <input 
+                        type="url"
+                        className={styles.formInput}
+                        placeholder="Ex: https://imagens.com/bloco-concreto.jpg"
+                        value={formDados.imagemUrl && (formDados.imagemUrl.startsWith('http://') || formDados.imagemUrl.startsWith('https://')) ? formDados.imagemUrl : ''}
+                        onChange={(e) => {
+                          const val = e.target.value.trim();
+                          setFormDados(prev => ({ ...prev, imagemUrl: val || null }));
+                          setErroCarregarUrl(false);
+                        }}
+                      />
+                      <span className={styles.photoHelpText}>
+                        Cole o link direto da imagem que você pegou na internet.
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Pré-visualização da Foto */}
+                  {formDados.imagemUrl && (
+                    <div className={styles.photoPreviewCard}>
+                      <div className={styles.previewImageContainer}>
+                        <img 
+                          src={formDados.imagemUrl} 
+                          alt="Pré-visualização do produto" 
+                          onLoad={() => setErroCarregarUrl(false)}
+                          onError={() => setErroCarregarUrl(true)}
+                        />
+                      </div>
+                      <div className={styles.previewDetails}>
+                        <div className={styles.previewStatus}>
+                          {erroCarregarUrl ? (
+                            <span className={styles.previewError}>
+                              <AlertCircle size={14} /> Não foi possível carregar a imagem deste link
+                            </span>
+                          ) : (
+                            <span className={styles.previewSuccess}>
+                              <Check size={14} /> Imagem pronta
+                            </span>
+                          )}
+                          <span className={styles.previewSourceBadge}>
+                            {formDados.imagemUrl.startsWith('http') ? 'Link da Internet' : 'Arquivo Local'}
+                          </span>
+                        </div>
+                        <span className={styles.previewUrlText} title={formDados.imagemUrl}>
+                          {formDados.imagemUrl}
+                        </span>
+                      </div>
+                      <button 
+                        type="button" 
+                        className={styles.previewRemoveBtn}
+                        onClick={() => {
+                          setFormDados(prev => ({ ...prev, imagemUrl: null }));
+                          setErroCarregarUrl(false);
+                        }}
+                        title="Remover foto do produto"
+                      >
+                        <Trash2 size={14} /> Remover
+                      </button>
+                    </div>
+                  )}
                 </div>
 
 

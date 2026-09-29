@@ -6,8 +6,8 @@
 **Perfil:** Freelancer
 **Atende clientes:** Pessoas construindo a própria casa, mestres de obra e construtoras.
 **Equipe:** Operação tocada por uma pessoa.
-**Ferramentas:** Site institucional e Instagram.
-**Principais entregas:** Materiais de construção e orçamentos.
+**Ferramentas:** Site institucional, Instagram, Catálogo Digital e Painel Administrativo.
+**Principais entregas:** Materiais de construção, orçamentos e catálogo digital de produtos.
 
 ## Contexto adicional
 
