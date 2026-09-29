@@ -10,5 +10,4 @@ class StoreConfigUpdate(StoreConfigBase):
 class StoreConfigResponse(StoreConfigBase):
     id: str
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}

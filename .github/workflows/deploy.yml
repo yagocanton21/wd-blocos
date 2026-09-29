@@ -9,6 +9,21 @@ jobs:
   test-and-deploy:
     runs-on: ubuntu-latest
     
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: wd_blocos_secret
+          POSTGRES_DB: wd_blocos
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: 📦 Checkout Repository
         uses: actions/checkout@v4
@@ -31,6 +46,8 @@ jobs:
           python-version: '3.11'
           
       - name: 🧪 Run Backend Tests
+        env:
+          DATABASE_URL: postgresql+psycopg://postgres:wd_blocos_secret@localhost:5432/wd_blocos
         run: |
           cd server
           pip install -r requirements.txt
