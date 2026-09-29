@@ -174,16 +174,19 @@ export default function QuoteDrawer({
                             value={item.quantidade}
                             min={item.produto.qtdMinima || 1}
                             onChange={(e) => {
-                              const val = parseInt(e.target.value, 10);
-                              const min = item.produto.qtdMinima || 1;
-                              onAtualizarQuantidade(
-                                item.produto.id,
-                                isNaN(val) || val < min ? min : val
-                              );
+                              const raw = e.target.value;
+                              if (raw === '') {
+                                onAtualizarQuantidade(item.produto.id, '');
+                                return;
+                              }
+                              const val = parseInt(raw, 10);
+                              if (!isNaN(val)) {
+                                onAtualizarQuantidade(item.produto.id, val);
+                              }
                             }}
                             onBlur={(e) => {
-                              const val = parseInt(e.target.value, 10);
                               const min = item.produto.qtdMinima || 1;
+                              const val = parseInt(e.target.value, 10);
                               if (isNaN(val) || val < min) {
                                 onAtualizarQuantidade(item.produto.id, min);
                               }

@@ -181,7 +181,7 @@ export default function App() {
   }, [itensCotacao]);
 
   const totalItens = itensCotacao.length;
-  const totalVolumes = itensCotacao.reduce((acc, item) => acc + item.quantidade, 0);
+  const totalVolumes = itensCotacao.reduce((acc, item) => acc + (Number(item.quantidade) || 0), 0);
 
   // SE ESTIVER NO MODO ADMINISTRADOR:
   if (modoAdmin) {

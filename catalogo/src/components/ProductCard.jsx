@@ -102,10 +102,21 @@ export default function ProductCard({
               min={qtdMinima}
               step={incremento}
               onChange={(e) => {
-                const val = parseInt(e.target.value, 10);
-                setQuantidade(isNaN(val) || val < qtdMinima ? qtdMinima : val);
+                const raw = e.target.value;
+                if (raw === '') {
+                  setQuantidade('');
+                  return;
+                }
+                const val = parseInt(raw, 10);
+                if (!isNaN(val)) setQuantidade(val);
               }}
-              onBlur={() => setQuantidade(prev => Math.max(qtdMinima, prev))}
+              onBlur={() => {
+                setQuantidade(prev => {
+                  const val = parseInt(prev, 10);
+                  if (isNaN(val) || val < qtdMinima) return qtdMinima;
+                  return val;
+                });
+              }}
             />
             <button 
               type="button" 
