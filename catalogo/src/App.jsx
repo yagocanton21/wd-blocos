@@ -24,6 +24,15 @@ export default function App() {
     return window.location.search.includes('admin') || window.location.hash.includes('admin');
   });
 
+  // Sincroniza o modo admin com o botão "Voltar" do navegador
+  useEffect(() => {
+    const handlePopState = () => {
+      setModoAdmin(window.location.search.includes('admin') || window.location.hash.includes('admin'));
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   // Estados de Paginação
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [itensPorPagina, setItensPorPagina] = useState(12);
@@ -179,6 +188,7 @@ export default function App() {
     return (
       <AdminPanel 
         onVoltarCatalogo={() => {
+          window.history.pushState(null, '', window.location.pathname);
           setModoAdmin(false);
           carregarDados();
         }} 
@@ -216,7 +226,10 @@ export default function App() {
         setTermoBusca={setTermoBusca}
         totalItensCotacao={totalItens}
         onAbrirCotacao={() => setDrawerAberto(true)}
-        onAbrirAdmin={() => setModoAdmin(true)}
+        onAbrirAdmin={() => {
+          window.history.pushState(null, '', '#admin');
+          setModoAdmin(true);
+        }}
         configLoja={configLoja}
       />
 
