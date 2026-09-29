@@ -81,7 +81,7 @@ app.include_router(upload_router)
 app.include_router(config_router)
 
 # Servir arquivos de upload estaticamente
-UPLOAD_DIR = "/app/uploads"
+UPLOAD_DIR = os.getenv("UPLOAD_DIR", "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 

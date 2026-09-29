@@ -7,7 +7,7 @@ from PIL import Image
 
 router = APIRouter(prefix="/api/upload", tags=["Upload"])
 
-UPLOAD_DIR = "/app/uploads"
+UPLOAD_DIR = os.getenv("UPLOAD_DIR", "uploads")
 # Em dev local, garante que a pasta exista
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
