@@ -155,7 +155,7 @@ export default function AdminPanel({ onVoltarCatalogo }) {
     e.preventDefault();
     setErroLogin('');
     try {
-      const res = await loginAdmin(usuario, senha);
+      const res = await loginAdmin(usuario, senha, manterConectado);
       if (res.success) {
         setAutenticado(true);
         carregarDados();
@@ -387,6 +387,19 @@ export default function AdminPanel({ onVoltarCatalogo }) {
                   onChange={(e) => setSenha(e.target.value)}
                   required 
                 />
+              </div>
+
+              <div className={styles.formGroup} style={{ flexDirection: 'row', alignItems: 'center', gap: '8px', cursor: 'pointer', marginTop: '10px' }}>
+                <input 
+                  type="checkbox" 
+                  id="manterConectado"
+                  checked={manterConectado}
+                  onChange={(e) => setManterConectado(e.target.checked)}
+                  style={{ cursor: 'pointer' }}
+                />
+                <label htmlFor="manterConectado" style={{ cursor: 'pointer', fontSize: '0.9rem', margin: 0, userSelect: 'none' }}>
+                  Manter-me conectado
+                </label>
               </div>
 
               <button type="submit" className={styles.btnLogin}>

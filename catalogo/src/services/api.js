@@ -156,11 +156,11 @@ export async function excluirProduto(id) {
 }
 
 // Autenticação de Administrador
-export async function loginAdmin(username, password) {
+export async function loginAdmin(username, password, remember_me = false) {
   const res = await fetch(`${API_BASE}/auth/login`, getFetchOptions({
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password })
+    body: JSON.stringify({ username, password, remember_me })
   }));
   const data = await res.json();
   if (!res.ok) throw new Error(data.detail || 'Falha no login');

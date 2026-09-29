@@ -10,8 +10,15 @@ router = APIRouter(prefix="/api/auth", tags=["Autenticação"])
 @router.post("/login", response_model=LoginResponse)
 def login(creds: LoginRequest, response: Response):
     if creds.username == ADMIN_USER and creds.password == ADMIN_PASSWORD:
-        # Default expiration: 30 days
-        expire = datetime.now(timezone.utc) + timedelta(days=30)
+        if creds.remember_me:
+            # Sessão persistente por 30 dias
+            expire = datetime.now(timezone.utc) + timedelta(days=30)
+            cookie_max_age = 30 * 24 * 60 * 60
+        else:
+            # Sessão que expira ao fechar o navegador
+            expire = datetime.now(timezone.utc) + timedelta(days=1)
+            cookie_max_age = None
+
         to_encode = {"sub": ADMIN_USER, "exp": expire}
         encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
@@ -22,7 +29,7 @@ def login(creds: LoginRequest, response: Response):
             httponly=True,
             secure=False, # Idealmente True em produção (HTTPS), False no dev
             samesite="lax",
-            max_age=30 * 24 * 60 * 60 # 30 days em segundos
+            max_age=cookie_max_age
         )
 
         return LoginResponse(
