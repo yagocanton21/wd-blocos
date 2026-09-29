@@ -1,4 +1,4 @@
-import { PRODUTOS_INICIAIS } from '../data/produtos';
+
 
 // Em produção (Docker/VPS): Nginx proxia /api/ para o backend — URL relativa
 // Em dev local: aponta direto para localhost:8001

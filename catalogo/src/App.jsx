@@ -6,7 +6,7 @@ import Pagination from './components/Pagination';
 import AdminPanel from './components/AdminPanel';
 import Footer from './components/Footer';
 import { getProdutos, getCategorias, getConfig } from './services/api';
-import { INFO_EMPRESA } from './data/produtos';
+
 import { SlidersHorizontal, PackageOpen, Layers } from 'lucide-react';
 import styles from './App.module.css';
 
