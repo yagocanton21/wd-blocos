@@ -18,11 +18,23 @@ jobs:
         with:
           node-version: '20'
           
-      - name: 🏗️ Build Frontend (Dry Run)
+      - name: 🏗️ Build & Test Frontend
         run: |
           cd catalogo
           npm ci
+          npm run test
           npm run build
+          
+      - name: 🐍 Setup Python (Backend Check)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          
+      - name: 🧪 Run Backend Tests
+        run: |
+          cd server
+          pip install -r requirements.txt
+          PYTHONPATH=. pytest tests
           
       - name: 🚀 Deploy to Oracle VPS
         uses: appleboy/ssh-action@v1.0.3
