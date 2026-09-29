@@ -73,10 +73,6 @@ export default function QuoteDrawer({
 
     itensCotacao.forEach((item, idx) => {
       mensagem += `\n${idx + 1}. *${item.quantidade} ${formatarUnidade(item.quantidade, item.produto.unidade)}* — ${item.produto.nome}`;
-      mensagem += `\n   ↳ Cód: ${item.produto.codigo} | Medida: ${item.produto.dimensoes}`;
-      if (item.produto.resistencia && item.produto.resistencia !== 'Livre de impurezas') {
-        mensagem += ` | Resistência: ${item.produto.resistencia}`;
-      }
     });
 
     mensagem += `\n\n─────────────────\n`;
