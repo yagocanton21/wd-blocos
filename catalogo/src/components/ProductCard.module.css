@@ -19,7 +19,7 @@
 
 .visualContainer {
   padding: 20px 16px;
-  background: radial-gradient(circle at center, #FFFFFF 0%, #F1F5F9 100%);
+  background: radial-gradient(circle at center, #E2E8F0 0%, #CBD5E1 100%);
   position: relative;
   height: 180px;
   display: flex;
@@ -47,6 +47,7 @@
   object-position: center;
   transition: transform 0.4s ease;
   display: block;
+  mix-blend-mode: multiply;
 }
 
 .productCard:hover .productPhoto {
