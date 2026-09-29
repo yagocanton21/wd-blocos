@@ -163,7 +163,7 @@ export default function QuoteDrawer({
                             className={styles.stepperBtnMini}
                             onClick={() => onAtualizarQuantidade(
                               item.produto.id, 
-                              Math.max(1, item.quantidade - 1)
+                              Math.max(item.produto.qtdMinima || 1, item.quantidade - 1)
                             )}
                           >
                             <Minus size={12} />
@@ -172,7 +172,7 @@ export default function QuoteDrawer({
                             type="number" 
                             className={styles.stepperInputMini}
                             value={item.quantidade}
-                            min={1}
+                            min={item.produto.qtdMinima || 1}
                             onChange={(e) => {
                               const raw = e.target.value;
                               if (raw === '') {
@@ -185,7 +185,7 @@ export default function QuoteDrawer({
                               }
                             }}
                             onBlur={(e) => {
-                              const min = 1;
+                              const min = item.produto.qtdMinima || 1;
                               const val = parseInt(e.target.value, 10);
                               if (isNaN(val) || val < min) {
                                 onAtualizarQuantidade(item.produto.id, min);
