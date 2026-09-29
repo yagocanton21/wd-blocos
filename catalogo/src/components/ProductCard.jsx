@@ -8,11 +8,11 @@ export default function ProductCard({
   onAdicionarCotacao, 
   quantidadeNoCarrinho 
 }) {
-  const [quantidade, setQuantidade] = useState(produto.qtdMinima || 1);
+  const [quantidade, setQuantidade] = useState(1);
   const [adicionadoAnim, setAdicionadoAnim] = useState(false);
 
-  const incremento = produto.incremento || 1;
-  const qtdMinima = produto.qtdMinima || 1;
+  const incremento = 1;
+  const qtdMinima = 1;
 
   const handleDiminuir = (e) => {
     e.stopPropagation();
@@ -41,9 +41,8 @@ export default function ProductCard({
     return un || 'unidades';
   };
 
-  // Linha de especificações essenciais resumida
   const specText = [
-    `Mín: ${produto.qtdMinima || 1} ${formatarUnidade(produto.qtdMinima || 1, produto.unidade)}`
+    `Mín: 1 ${formatarUnidade(1, produto.unidade)}`
   ].filter(Boolean).join(' • ');
 
   return (
