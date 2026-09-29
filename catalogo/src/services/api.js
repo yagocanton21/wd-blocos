@@ -66,9 +66,9 @@ export async function getStats() {
     return await res.json();
   } catch {
     return {
-      totalProdutos: PRODUTOS_INICIAIS.length,
-      prontaEntrega: PRODUTOS_INICIAIS.filter(p => p.prontaEntrega).length,
-      sobEncomenda: PRODUTOS_INICIAIS.filter(p => !p.prontaEntrega).length,
+      totalProdutos: 0,
+      prontaEntrega: 0,
+      sobEncomenda: 0,
       porCategoria: {}
     };
   }

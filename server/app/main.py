@@ -17,22 +17,39 @@ import os
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("wd-blocos-api")
 
+def run_migrations():
+    """Executa migrações do Alembic de forma resiliente."""
+    from alembic.config import Config
+    from alembic import command
+    from sqlalchemy import inspect
+
+    # Procura alembic.ini no diretório da aplicação ou raiz
+    ini_path = "alembic.ini"
+    if not os.path.exists(ini_path):
+        ini_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "alembic.ini")
+
+    alembic_cfg = Config(ini_path)
+    inspector = inspect(engine)
+    tables = inspector.get_table_names()
+
+    # Se já existirem tabelas mas não houver a tabela alembic_version, faz o stamp para head
+    if "alembic_version" not in tables and "produtos" in tables:
+        logger.info("📌 Banco existente detectado. Registrando versão inicial no Alembic (stamp head)...")
+        command.stamp(alembic_cfg, "head")
+    else:
+        logger.info("📦 Executando migrações do Alembic (upgrade head)...")
+        command.upgrade(alembic_cfg, "head")
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Inicialização: cria tabelas se não existirem
-    logger.info("📦 Inicializando banco de dados PostgreSQL...")
-    Base.metadata.create_all(bind=engine)
-
-    # Garante tipo TEXT para imagem_url em bases existentes caso tenham sido criadas com varchar(500)
+    # Inicialização: executa migrações do Alembic
+    logger.info("📦 Inicializando banco de dados com Alembic...")
     try:
-        from sqlalchemy import text
-        with engine.connect() as conn:
-            conn.execute(text("ALTER TABLE produtos ALTER COLUMN imagem_url TYPE TEXT;"))
-            conn.commit()
+        run_migrations()
+        logger.info("✅ Banco pronto e migrações do Alembic aplicadas.")
     except Exception as e:
-        logger.debug(f"Ajuste de coluna imagem_url ignorado: {e}")
-
-    logger.info("✅ Banco pronto. Nenhuma semente inicial gerada por escolha do usuário.")
+        logger.error(f"⚠️ Erro ao executar Alembic: {e}. Executando fallback Base.metadata.create_all...")
+        Base.metadata.create_all(bind=engine)
 
     yield
     logger.info("🛑 Encerrando aplicação FastAPI.")
