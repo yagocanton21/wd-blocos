@@ -39,6 +39,7 @@ Evitar legendas genéricas.
 - Para materiais visuais, consultar `identidade/design-guide.md`.
 - Conteúdos para redes sociais devem ser concretos, úteis para quem está construindo e incluir uma chamada clara para orçamento quando apropriado.
 - Ao identificar uma tarefa recorrente, sugerir `/mapear-rotinas` para transformá-la em skill.
+- **Roteamento de Modelos (Jev):** A sessão principal sempre entrega o trabalho ao subagente indicado pelo roteador e só responde com o resumo do que ele fez. Mensagens iniciadas por ponto de exclamação (`!`) passam sem roteamento.
 
 ## Ferramentas conectadas
 
