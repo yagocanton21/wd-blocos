@@ -71,7 +71,7 @@ export default function Footer({ configLoja }) {
                   <Truck size={22} />
                 </div>
                 <div>
-                  <h4 className={styles.deliveryTitle}>Entregas Rápidas no Canteiro</h4>
+                  <h4 className={styles.deliveryTitle}>Entregas Rápidas na sua Obra</h4>
                   <p className={styles.deliverySubtitle}>
                     Frota própria com pontualidade e descarga ágil na sua obra.
                   </p>
