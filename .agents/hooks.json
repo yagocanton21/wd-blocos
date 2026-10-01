@@ -1,0 +1,11 @@
+{
+  "router-jev": {
+    "PreInvocation": [
+      {
+        "type": "command",
+        "command": "node scripts/router.js",
+        "timeout": 15
+      }
+    ]
+  }
+}

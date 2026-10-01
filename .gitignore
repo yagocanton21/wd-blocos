@@ -35,3 +35,8 @@ server/.env
 # Frontend Build
 catalogo/dist/
 
+# Configurações e Logs de Roteamento
+.env
+.agents/router_log.json
+.agents/last_router_decision.json
+
