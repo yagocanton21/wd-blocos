@@ -114,7 +114,10 @@ function getLastUserMessage(transcriptPath) {
           if (match && match[1]) {
             text = match[1].trim();
           }
-          return text;
+          return {
+            text: text,
+            stepIndex: typeof parsed.step_index === 'number' ? parsed.step_index : null
+          };
         }
       } catch (e) {
         // Linha com erro de parsing, continua procurando
@@ -125,6 +128,7 @@ function getLastUserMessage(transcriptPath) {
   }
   return null;
 }
+
 
 // Chamar Jev via OpenRouter
 function queryJev(userMessage) {
@@ -225,8 +229,14 @@ async function main() {
 
   // Obter mensagem do usuário (do transcript ou de argumento manual)
   let userMessage = null;
+  let stepIndex = null;
+
   if (hookContext.transcriptPath) {
-    userMessage = getLastUserMessage(hookContext.transcriptPath);
+    const userMsgObj = getLastUserMessage(hookContext.transcriptPath);
+    if (userMsgObj) {
+      userMessage = userMsgObj.text;
+      stepIndex = userMsgObj.stepIndex;
+    }
   }
 
   if (!userMessage && process.argv[2]) {
@@ -239,10 +249,25 @@ async function main() {
     process.exit(0);
   }
 
+  // Desduplicação: Se este mesmo turno do usuário já foi avaliado (mesmo stepIndex),
+  // não repete a chamada à API Jev nem duplica registros no log
+  if (stepIndex !== null && fs.existsSync(LAST_DECISION_FILE)) {
+    try {
+      const lastDecision = JSON.parse(fs.readFileSync(LAST_DECISION_FILE, 'utf8'));
+      if (lastDecision && lastDecision.stepIndex === stepIndex) {
+        console.log(JSON.stringify({ injectSteps: [] }));
+        process.exit(0);
+      }
+    } catch (e) {
+      // Ignora erro de leitura
+    }
+  }
+
   const cleanMessage = userMessage.trim();
   if (cleanMessage.startsWith('!')) {
     const bypassLog = {
       timestamp: new Date().toISOString(),
+      stepIndex: stepIndex,
       message: cleanMessage,
       nivel: "bypass",
       confidence: 1.0,
@@ -310,6 +335,7 @@ async function main() {
 
     const logEntry = {
       timestamp: new Date().toISOString(),
+      stepIndex: stepIndex,
       message: cleanMessage,
       nivel: nivelChoice,
       confidence: parseFloat(confidence.toFixed(2)),
