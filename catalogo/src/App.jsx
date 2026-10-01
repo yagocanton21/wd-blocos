@@ -5,6 +5,7 @@ import QuoteDrawer from './components/QuoteDrawer';
 import Pagination from './components/Pagination';
 import AdminPanel from './components/AdminPanel';
 import Footer from './components/Footer';
+import UpdateNotification from './components/UpdateNotification';
 import { getProdutos, getCategorias, getConfig } from './services/api';
 
 import { SlidersHorizontal, PackageOpen, Layers } from 'lucide-react';
@@ -376,6 +377,9 @@ export default function App() {
 
       {/* Rodapé */}
       <Footer configLoja={configLoja} />
+
+      {/* Alerta de Nova Versão em Tempo Real */}
+      <UpdateNotification />
     </div>
   );
 }
