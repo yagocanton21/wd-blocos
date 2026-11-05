@@ -36,6 +36,16 @@ def upgrade() -> None:
 
         # 2. Adiciona Foreign Key entre produtos e categorias para impedir deleção com produtos órfãos
         if 'categorias' in tables:
+            # Garante que qualquer categoria referenciada em produtos já existentes esteja presente em categorias
+            op.execute("""
+                INSERT INTO categorias (id, label)
+                SELECT DISTINCT p.categoria, COALESCE(NULLIF(p.categoria_label, ''), p.categoria)
+                FROM produtos p
+                LEFT JOIN categorias c ON p.categoria = c.id
+                WHERE c.id IS NULL AND p.categoria IS NOT NULL
+                ON CONFLICT (id) DO NOTHING;
+            """)
+
             fks = inspector.get_foreign_keys('produtos')
             fk_names = [fk['name'] for fk in fks]
             if 'fk_produtos_categoria' not in fk_names:
