@@ -12,6 +12,7 @@ from .routers.categories import router as categories_router
 from .routers.upload import router as upload_router
 from .routers.config import router as config_router
 from .models.config import StoreConfig
+from .config import ALLOWED_ORIGINS
 import os
 
 logging.basicConfig(level=logging.INFO)
@@ -42,6 +43,11 @@ def run_migrations():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Em ambiente de testes, o schema é gerenciado pelo conftest
+    if os.getenv("TESTING") == "1":
+        yield
+        return
+
     # Inicialização: executa migrações do Alembic
     logger.info("📦 Inicializando banco de dados com Alembic...")
     try:
@@ -63,10 +69,11 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# CORS liberado para o frontend Vite React
+# CORS restrito aos domínios autorizados com suporte seguro a cookies
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

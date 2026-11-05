@@ -25,6 +25,10 @@ node_modules/
 dados/*
 !dados/README.md
 
+# Uploads de runtime
+uploads/*
+!uploads/.gitkeep
+
 # Python & Backend
 __pycache__/
 *.pyc

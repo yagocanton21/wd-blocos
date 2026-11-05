@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Boolean, Integer, Text, DateTime, JSON
+from sqlalchemy import Column, String, Boolean, Integer, Text, DateTime, JSON, ForeignKey
 from datetime import datetime
 from ..database import Base
 
@@ -6,9 +6,9 @@ class Product(Base):
     __tablename__ = "produtos"
 
     id = Column(String(100), primary_key=True, index=True)
-    codigo = Column(String(50), nullable=False, index=True)
+    codigo = Column(String(50), nullable=False, unique=True, index=True)
     nome = Column(String(255), nullable=False)
-    categoria = Column(String(100), nullable=False, index=True)
+    categoria = Column(String(100), ForeignKey("categorias.id", ondelete="RESTRICT"), nullable=False, index=True)
     categoria_label = Column(String(100), nullable=False)
     destaque = Column(Boolean, default=False)
     dimensoes = Column(String(100), nullable=True)

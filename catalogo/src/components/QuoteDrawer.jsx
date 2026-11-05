@@ -10,17 +10,9 @@ import {
   FileText, 
   Truck
 } from 'lucide-react';
-import { INFO_EMPRESA } from '../data/produtos';
+import { gerarMensagemWhatsApp, gerarLinkWhatsApp, formatarUnidade } from '../utils/whatsappQuote';
 import ProductVisual from './ProductVisual';
 import styles from './QuoteDrawer.module.css';
-
-const formatarUnidade = (qtd, un) => {
-  if (un === 'saco') return qtd > 1 ? 'sacos' : 'saco';
-  if (un === 'un') return qtd > 1 ? 'unidades' : 'unidade';
-  if (un === 'painel') return qtd > 1 ? 'painéis' : 'painel';
-  if (un === 'bisnaga') return qtd > 1 ? 'bisnagas' : 'bisnaga';
-  return un || 'unidades';
-};
 
 export default function QuoteDrawer({ 
   aberto, 
@@ -34,6 +26,7 @@ export default function QuoteDrawer({
   const [nomeCliente, setNomeCliente] = useState('');
   const [localEntrega, setLocalEntrega] = useState('');
   const [observacoes, setObservacoes] = useState('');
+  const [enviando, setEnviando] = useState(false);
 
   // Recupera dados salvos localmente
   useEffect(() => {
@@ -50,36 +43,27 @@ export default function QuoteDrawer({
   const handleEnviarWhatsApp = (e) => {
     e.preventDefault();
 
-    if (itensCotacao.length === 0) return;
+    if (itensCotacao.length === 0 || enviando) return;
+    setEnviando(true);
+    setTimeout(() => setEnviando(false), 2000);
 
     // Salva no storage para futuras cotações
     localStorage.setItem('wd_cliente_nome', nomeCliente);
     localStorage.setItem('wd_cliente_local', localEntrega);
 
-    // Formata mensagem profissional para o WhatsApp da WD Blocos
-    let mensagem = `*SOLICITAÇÃO DE ORÇAMENTO — WD BLOCOS*\n\n`;
-
-    if (nomeCliente.trim()) {
-      mensagem += `👤 *Cliente:* ${nomeCliente.trim()}\n`;
-    }
-    if (localEntrega.trim()) {
-      mensagem += `📍 *Entrega (Bairro/Cidade):* ${localEntrega.trim()}\n`;
-    }
-    if (observacoes.trim()) {
-      mensagem += `📝 *Observação:* ${observacoes.trim()}\n`;
-    }
-
-    mensagem += `\n📦 *LISTA DE MATERIAIS (${itensCotacao.length} itens):*\n`;
-
-    itensCotacao.forEach((item, idx) => {
-      mensagem += `\n${idx + 1}. *${item.quantidade} ${formatarUnidade(item.quantidade, item.produto.unidade)}* — ${item.produto.nome}`;
+    // Gera mensagem estruturada e link do WhatsApp via utilitário
+    const mensagem = gerarMensagemWhatsApp({
+      nomeCliente,
+      localEntrega,
+      observacoes,
+      itensCotacao
     });
 
-    mensagem += `\n\n─────────────────\n`;
-    mensagem += `Por favor, informar valores com frete e previsão de entrega. Aguardo retorno!`;
+    const urlZap = gerarLinkWhatsApp({
+      telefone: configLoja?.telefone_whatsapp,
+      mensagem
+    });
 
-    const telefoneWhatsapp = configLoja?.telefone_whatsapp || INFO_EMPRESA.telefoneWhatsapp;
-    const urlZap = `https://wa.me/${telefoneWhatsapp}?text=${encodeURIComponent(mensagem)}`;
     window.open(urlZap, '_blank');
   };
 
@@ -288,10 +272,12 @@ export default function QuoteDrawer({
             <button 
               type="button"
               className={styles.btnSubmitWhatsapp}
+              disabled={enviando}
               onClick={handleEnviarWhatsApp}
+              style={{ opacity: enviando ? 0.6 : 1, cursor: enviando ? 'not-allowed' : 'pointer' }}
             >
               <MessageSquare size={20} />
-              <span>Enviar Cotação pelo WhatsApp</span>
+              <span>{enviando ? 'Preparando WhatsApp...' : 'Enviar Cotação pelo WhatsApp'}</span>
             </button>
             <span className={styles.footerSafeNote}>
               ✓ Você será redirecionado para o WhatsApp com a mensagem pronta.

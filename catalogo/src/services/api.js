@@ -126,9 +126,10 @@ export async function atualizarProduto(id, dados) {
   return normalizarProduto(atualizado);
 }
 
-// Alternar status rápida (1 clique)
-export async function alternarProntaEntrega(id) {
-  const res = await fetch(`${API_BASE}/produtos/${id}/toggle-pronta-entrega`, getFetchOptions({
+// Alternar status rápida (1 clique com suporte a idempotência)
+export async function alternarProntaEntrega(id, valor) {
+  const query = valor !== undefined ? `?valor=${Boolean(valor)}` : '';
+  const res = await fetch(`${API_BASE}/produtos/${id}/toggle-pronta-entrega${query}`, getFetchOptions({
     method: 'PATCH',
     headers: getAuthHeaders()
   }));
@@ -136,8 +137,9 @@ export async function alternarProntaEntrega(id) {
   return await res.json();
 }
 
-export async function alternarAtivo(id) {
-  const res = await fetch(`${API_BASE}/produtos/${id}/toggle-ativo`, getFetchOptions({
+export async function alternarAtivo(id, valor) {
+  const query = valor !== undefined ? `?valor=${Boolean(valor)}` : '';
+  const res = await fetch(`${API_BASE}/produtos/${id}/toggle-ativo${query}`, getFetchOptions({
     method: 'PATCH',
     headers: getAuthHeaders()
   }));

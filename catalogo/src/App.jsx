@@ -6,9 +6,11 @@ import Pagination from './components/Pagination';
 import AdminPanel from './components/AdminPanel';
 import Footer from './components/Footer';
 import UpdateNotification from './components/UpdateNotification';
+import CatalogControls from './components/CatalogControls';
+import { useCart } from './hooks/useCart';
 import { getProdutos, getCategorias, getConfig } from './services/api';
 
-import { SlidersHorizontal, PackageOpen, Layers } from 'lucide-react';
+import { PackageOpen } from 'lucide-react';
 import styles from './App.module.css';
 
 export default function App() {
@@ -40,16 +42,6 @@ export default function App() {
 
   const catalogoRef = useRef(null);
 
-  // Estado do Carrinho / Lista de Cotação
-  const [itensCotacao, setItensCotacao] = useState(() => {
-    try {
-      const salvo = localStorage.getItem('wd_cotacao_itens');
-      return salvo ? JSON.parse(salvo) : [];
-    } catch {
-      return [];
-    }
-  });
-
   const [drawerAberto, setDrawerAberto] = useState(false);
   const [toast, setToast] = useState({ visivel: false, mensagem: '' });
   const [configLoja, setConfigLoja] = useState({ telefone_whatsapp: '5511942440440', telefone_exibicao: '(11) 94244-0440' });
@@ -60,6 +52,17 @@ export default function App() {
       setToast(prev => ({ ...prev, visivel: false }));
     }, 3000);
   };
+
+  // Gerenciamento de Cotação (Carrinho) desacoplado em hook
+  const {
+    itensCotacao,
+    handleAdicionarCotacao,
+    handleAtualizarQuantidade,
+    handleRemoverItem,
+    handleLimparCotacao,
+    mapQuantidades,
+    totalItens
+  } = useCart(mostrarToast);
 
   // Carrega produtos e categorias do PostgreSQL
   const carregarDados = async () => {
@@ -98,15 +101,6 @@ export default function App() {
     }
   }, [categoriaAtiva, termoBuscaDebounced, ordenacao, modoAdmin]);
 
-  // Persiste a lista de cotação no navegador
-  useEffect(() => {
-    try {
-      localStorage.setItem('wd_cotacao_itens', JSON.stringify(itensCotacao));
-    } catch (e) {
-      console.error('Erro ao salvar no localStorage', e);
-    }
-  }, [itensCotacao]);
-
   // Reseta para a página 1 ao alterar filtros, busca ou ordenação
   useEffect(() => {
     setPaginaAtual(1);
@@ -135,54 +129,6 @@ export default function App() {
       catalogoRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
-
-  // Manipulação do Carrinho de Cotação
-  const handleAdicionarCotacao = (produto, quantidade) => {
-    setItensCotacao(prev => {
-      const index = prev.findIndex(item => item.produto.id === produto.id);
-      if (index > -1) {
-        const novos = [...prev];
-        novos[index] = {
-          ...novos[index],
-          quantidade: novos[index].quantidade + quantidade
-        };
-        return novos;
-      } else {
-        return [...prev, { produto, quantidade }];
-      }
-    });
-    mostrarToast(`✅ ${produto.nome} adicionado à lista!`);
-  };
-
-  const handleAtualizarQuantidade = (produtoId, novaQuantidade) => {
-    setItensCotacao(prev => 
-      prev.map(item => 
-        item.produto.id === produtoId ? { ...item, quantidade: novaQuantidade } : item
-      )
-    );
-  };
-
-  const handleRemoverItem = (produtoId) => {
-    setItensCotacao(prev => prev.filter(item => item.produto.id !== produtoId));
-  };
-
-  const handleLimparCotacao = () => {
-    if (window.confirm('Deseja realmente esvaziar todos os itens da cotação?')) {
-      setItensCotacao([]);
-    }
-  };
-
-  // Mapeamento de quantidades para exibir no card
-  const mapQuantidades = useMemo(() => {
-    const mapa = {};
-    itensCotacao.forEach(item => {
-      mapa[item.produto.id] = item.quantidade;
-    });
-    return mapa;
-  }, [itensCotacao]);
-
-  const totalItens = itensCotacao.length;
-  const totalVolumes = itensCotacao.reduce((acc, item) => acc + (Number(item.quantidade) || 0), 0);
 
   // SE ESTIVER NO MODO ADMINISTRADOR:
   if (modoAdmin) {
@@ -257,48 +203,15 @@ export default function App() {
               </span>
             </div>
 
-            <div className={styles.controlsGroup}>
-              {/* Filtro de Categoria em Dropdown */}
-              <div className={styles.controlSelectWrapper}>
-                <Layers size={16} className={styles.controlIcon} />
-                <label htmlFor="categorySelect">Categoria:</label>
-                <select 
-                  id="categorySelect" 
-                  className={styles.controlSelect}
-                  value={categoriaAtiva}
-                  onChange={(e) => {
-                    setCategoriaAtiva(e.target.value);
-                    setPaginaAtual(1);
-                  }}
-                >
-                  <option value="todos">Todas as Categorias</option>
-                  {categorias.map((cat) => {
-                    const count = contagemPorCategoria[cat.id] || 0;
-                    return (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.label} {count > 0 ? `(${count})` : ''}
-                      </option>
-                    );
-                  })}
-                </select>
-              </div>
-
-              {/* Ordenação */}
-              <div className={styles.controlSelectWrapper}>
-                <SlidersHorizontal size={16} className={styles.controlIcon} />
-                <label htmlFor="sortSelect">Ordenar:</label>
-                <select 
-                  id="sortSelect" 
-                  className={styles.controlSelect}
-                  value={ordenacao}
-                  onChange={(e) => setOrdenacao(e.target.value)}
-                >
-                  <option value="destaque">Mais Cotados / Destaques</option>
-                  <option value="nome-asc">Nome do Produto (A - Z)</option>
-                  <option value="nome-desc">Nome do Produto (Z - A)</option>
-                </select>
-              </div>
-            </div>
+            <CatalogControls 
+              categoriaAtiva={categoriaAtiva}
+              setCategoriaAtiva={setCategoriaAtiva}
+              categorias={categorias}
+              contagemPorCategoria={contagemPorCategoria}
+              ordenacao={ordenacao}
+              setOrdenacao={setOrdenacao}
+              onResetPagina={() => setPaginaAtual(1)}
+            />
           </div>
 
           {/* Grid de Cards dos Produtos Paginados */}
